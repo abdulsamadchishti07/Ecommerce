@@ -1,16 +1,15 @@
 {% extends "base.html" %}
-{% block title %}Home — MyStore{% endblock %}
+{% block title %}{{ category.name }} — MyStore{% endblock %}
 {% block content %}
-<h1 class="text-2xl font-bold mb-6">All Products</h1>
+<h1 class="text-2xl font-bold mb-6">{{ category.name }}</h1>
 <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
     {% for product in products %}
         <a href="{{ product.get_absolute_url }}" class="block border rounded-lg p-4 hover:shadow-md transition">
             <p class="font-semibold">{{ product.name }}</p>
-            <p class="text-gray-500 text-sm">{{ product.category }}</p>
             <p class="text-indigo-600 font-bold mt-2">${{ product.price }}</p>
         </a>
     {% empty %}
-        <p class="text-gray-500">No products yet — add some in the admin.</p>
+        <p class="text-gray-500">No products in this category yet.</p>
     {% endfor %}
 </div>
 {% endblock %}
