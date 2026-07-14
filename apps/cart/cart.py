@@ -1,5 +1,7 @@
 import json
+# pyrefly: ignore [missing-import]
 import redis
+# pyrefly: ignore [missing-import]
 from django_redis import get_redis_connection
 from apps.products.models import ProductVariant
 

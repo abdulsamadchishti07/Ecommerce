@@ -20,7 +20,7 @@
 
     <header class="bg-white border-b border-gray-200">
         <nav class="max-w-6xl mx-auto flex items-center justify-between px-4 py-4">
-            <a href="{% url 'home' %}" class="text-xl font-bold">MyStore</a>
+            <a href="{% url 'products:home' %}" class="text-xl font-bold">MyStore</a>
             <div class="flex items-center gap-6 text-sm">
                 <a href="#" class="hover:text-indigo-600">Shop</a>
                 {% if user.is_authenticated %}
@@ -28,14 +28,11 @@
                 {% else %}
                     <a href="#" class="hover:text-indigo-600">Login</a>
                 {% endif %}
-                <a href="#" class="relative hover:text-indigo-600">
+                <a href="{% url 'cart:cart_detail' %}" class="relative hover:text-indigo-600">
                     Cart
-                    <a href="{% url 'cart:cart_detail' %}" class="relative hover:text-indigo-600">
-                        Cart
-                        <span class="ml-1 text-xs bg-indigo-600 text-white rounded-full px-2 py-0.5">
-                            {{ cart|length }}
-                        </span>
-                    </a>
+                    <span class="ml-1 text-xs bg-indigo-600 text-white rounded-full px-2 py-0.5">
+                        {{ cart|length }}
+                    </span>
                 </a>
             </div>
         </nav>

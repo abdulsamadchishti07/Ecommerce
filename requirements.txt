@@ -11,3 +11,5 @@ gunicorn==22.0.0
 stripe==9.8.0
 django-htmx==1.18.0
 whitenoise==6.6.0
+django-allauth
+PyJWT[crypto]

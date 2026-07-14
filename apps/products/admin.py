@@ -1,9 +1,5 @@
 from django.contrib import admin
 from .models import Category, Brand, Product, ProductImage, ProductVariant
-# Register your models here.
-
-from django.contrib import admin
-from .models import Category, Brand, Product, ProductImage, ProductVariant
 
 
 class ProductImageInline(admin.TabularInline):
