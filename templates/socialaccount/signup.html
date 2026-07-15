@@ -1,0 +1,100 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Signup — MyStore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body {
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+        }
+        .orb {
+            position: absolute; border-radius: 50%;
+            filter: blur(80px); opacity: 0.15;
+            animation: drift 8s ease-in-out infinite alternate;
+        }
+        .orb-1 { width: 400px; height: 400px; background: #6366f1; top: -100px; left: -100px; }
+        .orb-2 { width: 300px; height: 300px; background: #8b5cf6; bottom: -50px; right: -50px; animation-delay: -4s; }
+        @keyframes drift { 0% { transform: translate(0,0); } 100% { transform: translate(30px,20px); } }
+
+        .glass-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.10);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+        }
+        .field-input {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: white; width: 100%;
+            padding: 11px 14px; border-radius: 10px;
+            font-size: 14px; transition: all 0.2s;
+        }
+        .field-input::placeholder { color: rgba(255,255,255,0.3); }
+        .field-input:focus {
+            outline: none; border-color: rgba(99,102,241,0.6);
+            background: rgba(255,255,255,0.10);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+        }
+        .field-label { display: block; color: rgba(255,255,255,0.5); font-size: 12px; font-weight: 500; margin-bottom: 6px; letter-spacing: 0.04em; text-transform: uppercase; }
+        .primary-btn {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white; width: 100%; padding: 12px;
+            border-radius: 10px; font-weight: 500; font-size: 14px;
+            border: none; cursor: pointer; transition: all 0.2s;
+        }
+        .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(99,102,241,0.35); }
+        .error-msg { color: #f87171; font-size: 12px; margin-top: 4px; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        .fade-up { animation: fadeUp 0.5s ease forwards; }
+        .fade-up-d { animation: fadeUp 0.5s 0.12s ease both; }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4 relative overflow-hidden">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="w-full max-w-md relative z-10">
+        <div class="text-center mb-7 fade-up">
+            <a href="/" class="inline-flex items-center text-white text-2xl font-bold">
+                <span style="width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:inline-block;margin-right:8px;"></span>
+                MyStore
+            </a>
+        </div>
+
+        <div class="glass-card rounded-2xl p-8 fade-up-d">
+            <h1 class="text-white text-xl font-semibold mb-1">Almost there</h1>
+            <p class="text-white/40 text-sm mb-6">Confirm your details to finish signing in with {{ account.get_provider.name }}.</p>
+
+            <form method="post" action=".">
+                {% csrf_token %}
+                
+                <div class="mb-5">
+                    <label class="field-label" for="id_email">Email address</label>
+                    <input type="email" id="id_email" name="email" required
+                        value="{{ form.email.value|default:'' }}"
+                        class="field-input">
+                    {% if form.email.errors %}
+                        <p class="error-msg">{{ form.email.errors|first }}</p>
+                    {% endif %}
+                </div>
+
+                {% if form.non_field_errors %}
+                    <div class="mb-4 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/20">
+                        <p class="text-red-400 text-xs">{{ form.non_field_errors|first }}</p>
+                    </div>
+                {% endif %}
+
+                <button type="submit" class="primary-btn">Complete Sign Up</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

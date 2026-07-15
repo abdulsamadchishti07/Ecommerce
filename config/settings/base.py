@@ -163,20 +163,29 @@ AUTH_USER_MODEL = "accounts.User"
 SITE_ID = 1
 
 AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",
-    "allauth.account.auth_backends.AuthenticationBackend",
+    "django.contrib.auth.backends.ModelBackend",        # admin login (password)
+    "allauth.account.auth_backends.AuthenticationBackend",  # email + Google
 ]
 
-SOCIALACCOUNT_ONLY = True
+# allauth — email+password AND Google OAuth (no username)
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_LOGIN_METHODS = {"email"}
-ACCOUNT_SIGNUP_FIELDS = ["email*"]
-ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+ACCOUNT_EMAIL_VERIFICATION = "optional"   # send verification email but don't block login
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+LOGIN_REDIRECT_URL = "/"
+ACCOUNT_LOGOUT_REDIRECT_URL = "/"
+
+# Auto-connect Google accounts to existing Django users with the same email
+# (Prevents the intermediate "/accounts/social/signup/" page for existing users)
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
 
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
         "SCOPE": ["profile", "email"],
         "AUTH_PARAMS": {"access_type": "online"},
+
         "OAUTH_PKCE_ENABLED": True,
     }
 }
