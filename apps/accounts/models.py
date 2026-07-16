@@ -40,12 +40,17 @@ class User(AbstractUser):
 
 
 class Profile(models.Model):
+    ROLE_CHOICES = (
+        ("B", "Buyer"),
+        ("S", "Seller"),
+    )
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
     bio = models.TextField(blank=True)
+    role = models.CharField(max_length=1, choices=ROLE_CHOICES, default="B")
 
     def __str__(self):
-        return f"{self.user.email}'s Profile"
+        return f"{self.user.email}'s Profile ({self.get_role_display()})"
 
 
 class Address(models.Model):

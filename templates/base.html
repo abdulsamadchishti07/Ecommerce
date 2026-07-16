@@ -1,57 +1,89 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}My Ecommerce Store{% endblock %}</title>
+    <meta name="description" content="EvoCart — Shop Smart. Trust Evo. Find the best products at great prices.">
+    <title>{% block title %}EvoCart — Shop Smart. Trust Evo.{% endblock %}</title>
 
-    <!-- Tailwind via CDN for now — swap for the Tailwind CLI build once
-         the design is stable (CDN is fine for dev, not for production). -->
+    <!-- EvoCart Design System -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+
+    <!-- Tailwind CDN (utility layer only — override with base.css classes) -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
-    <!-- Alpine.js for tiny bits of client-side interactivity -->
+    <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js"></script>
 
     {% block extra_head %}{% endblock %}
 </head>
-<body class="min-h-screen bg-gray-50 text-gray-900 flex flex-col" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
-    <header class="bg-white border-b border-gray-200">
-        <nav class="max-w-6xl mx-auto flex items-center justify-between px-4 py-4">
-            <a href="{% url 'products:home' %}" class="text-xl font-bold">MyStore</a>
-            <div class="flex items-center gap-6 text-sm">
-                <a href="#" class="hover:text-indigo-600">Shop</a>
+    <header class="site-header">
+        <nav class="site-nav px-4 md:px-8">
+
+            <!-- Logo -->
+            <a href="{% url 'products:home' %}" class="nav-logo" aria-label="EvoCart home">
+                <img src="{% static 'images/logo.png' %}" alt="EvoCart">
+            </a>
+
+            <!-- Mobile hamburger -->
+            <button class="nav-hamburger" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <!-- Links -->
+            <ul class="nav-links" id="nav-links">
+                <li><a href="{% url 'products:home' %}">Shop</a></li>
                 {% if user.is_authenticated %}
-                    <a href="#" class="hover:text-indigo-600">Account</a>
+                    <li><a href="{% url 'profile' %}">Account</a></li>
+                    <li><a href="{% url 'account_logout' %}">Logout</a></li>
                 {% else %}
-                    <a href="#" class="hover:text-indigo-600">Login</a>
+                    <li><a href="{% url 'account_login' %}">Login</a></li>
                 {% endif %}
-                <a href="{% url 'cart:cart_detail' %}" class="relative hover:text-indigo-600">
-                    Cart
-                    <span class="ml-1 text-xs bg-indigo-600 text-white rounded-full px-2 py-0.5">
-                        {{ cart|length }}
-                    </span>
-                </a>
-            </div>
+                <li>
+                    <a href="{% url 'cart:cart_detail' %}">
+                        Cart
+                        <span class="cart-badge">{{ cart|length }}</span>
+                    </a>
+                </li>
+            </ul>
+
         </nav>
     </header>
 
-    <main class="flex-1 max-w-6xl mx-auto w-full px-4 py-8">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="mb-4 px-4 py-3 rounded-md bg-indigo-50 text-indigo-800 text-sm">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
+    <main class="site-main">
+        <div class="container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="message-alert message-alert--{{ message.tags|default:'info' }}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
 
-        {% block content %}{% endblock %}
+            {% block content %}{% endblock %}
+        </div>
     </main>
 
-    <footer class="border-t border-gray-200 py-6 text-center text-sm text-gray-500">
-        &copy; {% now "Y" %} MyStore. Built with Django + HTMX + Tailwind.
+    <footer class="site-footer">
+        &copy; {% now "Y" %} EvoCart. Shop Smart. Trust Evo. &mdash; Built with Django + HTMX.
     </footer>
+
+    <!-- Mobile nav toggle script -->
+    <script>
+        const toggle = document.getElementById('nav-toggle');
+        const navLinks = document.getElementById('nav-links');
+        toggle.addEventListener('click', () => {
+            const isOpen = navLinks.classList.toggle('open');
+            toggle.setAttribute('aria-expanded', isOpen);
+        });
+    </script>
+
 </body>
 </html>

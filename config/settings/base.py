@@ -151,6 +151,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 
 # Default primary key field type
@@ -179,13 +180,15 @@ ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 
 # Auto-connect Google accounts to existing Django users with the same email
 # (Prevents the intermediate "/accounts/social/signup/" page for existing users)
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+SOCIALACCOUNT_ADAPTER = "apps.accounts.adapters.CustomSocialAccountAdapter"
 
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
         "SCOPE": ["profile", "email"],
         "AUTH_PARAMS": {"access_type": "online"},
-
         "OAUTH_PKCE_ENABLED": True,
+        "VERIFIED_EMAIL": True,
     }
 }

@@ -1,85 +1,25 @@
-{% load i18n socialaccount %}
+{% load i18n socialaccount static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Account — MyStore</title>
-    <meta name="description" content="Create a MyStore account to start shopping.">
+    <title>Create Account — EvoCart</title>
+    <meta name="description" content="Create a EvoCart account to start shopping.">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * { font-family: 'Inter', sans-serif; }
-        body {
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            min-height: 100vh;
-        }
-        .orb {
-            position: absolute; border-radius: 50%;
-            filter: blur(80px); opacity: 0.15;
-            animation: drift 8s ease-in-out infinite alternate;
-        }
-        .orb-1 { width: 380px; height: 380px; background: #8b5cf6; top: -80px; right: -80px; }
-        .orb-2 { width: 280px; height: 280px; background: #6366f1; bottom: -60px; left: -60px; animation-delay: -3s; }
-        @keyframes drift { 0% { transform: translate(0,0); } 100% { transform: translate(25px,15px); } }
-
-        .glass-card {
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.10);
-            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
-        }
-        .field-input {
-            background: rgba(255,255,255,0.07);
-            border: 1px solid rgba(255,255,255,0.12);
-            color: white; width: 100%;
-            padding: 11px 14px; border-radius: 10px;
-            font-size: 14px; transition: all 0.2s;
-        }
-        .field-input::placeholder { color: rgba(255,255,255,0.3); }
-        .field-input:focus {
-            outline: none;
-            border-color: rgba(99,102,241,0.6);
-            background: rgba(255,255,255,0.10);
-            box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
-        }
-        .field-label { display: block; color: rgba(255,255,255,0.5); font-size: 12px; font-weight: 500; margin-bottom: 6px; letter-spacing: 0.04em; text-transform: uppercase; }
-        .primary-btn {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            color: white; width: 100%; padding: 12px;
-            border-radius: 10px; font-weight: 500; font-size: 14px;
-            border: none; cursor: pointer; transition: all 0.2s;
-        }
-        .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(99,102,241,0.35); }
-        .google-btn {
-            background: white; color: #1f1f1f; width: 100%;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            padding: 11px; border-radius: 10px; font-weight: 500; font-size: 14px;
-            border: none; cursor: pointer; transition: all 0.2s;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        }
-        .google-btn:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.4); transform: translateY(-1px); }
-        .divider { display: flex; align-items: center; gap: 12px; margin: 18px 0; }
-        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.1); }
-        .error-msg { color: #f87171; font-size: 12px; margin-top: 4px; }
-        /* Password strength indicator */
-        .strength-bar { height: 3px; border-radius: 2px; transition: all 0.3s; }
-        @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-        .fade-up { animation: fadeUp 0.5s ease forwards; }
-        .fade-up-d { animation: fadeUp 0.5s 0.12s ease both; }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
 </head>
-<body class="flex items-center justify-center p-4 relative overflow-hidden">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
+<body class="flex items-center justify-center min-h-screen p-4 md:p-8 relative">
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
 
     <div class="w-full max-w-md relative z-10">
         <div class="text-center mb-7 fade-up">
             <a href="/" class="inline-flex items-center text-white text-2xl font-bold">
-                <span style="width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:inline-block;margin-right:8px;"></span>
-                MyStore
+                <span style="width:8px;height:8px;border-radius:50%;background:#FF6A3D;display:inline-block;margin-right:8px;"></span>
+                EvoCart
             </a>
             <p class="text-white/35 text-sm mt-1">Create your free account</p>
         </div>

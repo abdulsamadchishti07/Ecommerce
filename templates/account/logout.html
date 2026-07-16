@@ -1,0 +1,51 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Out — EvoCart</title>
+    <meta name="description" content="Sign out of your EvoCart account.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 md:p-8 relative">
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <div class="w-full max-w-md relative z-10">
+        <!-- Brand -->
+        <div class="text-center mb-7 fade-up">
+            <a href="/" class="inline-flex items-center text-white text-2xl font-bold">
+                <span style="width:8px;height:8px;border-radius:50%;background:#FF6A3D;display:inline-block;margin-right:8px;"></span>
+                EvoCart
+            </a>
+            <p class="text-white/35 text-sm mt-1">Leaving so soon?</p>
+        </div>
+
+        <div class="glass-card rounded-2xl p-8 fade-up-d text-center">
+            <div class="w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center mx-auto mb-5">
+                <svg class="h-8 w-8 text-rose-500" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+                </svg>
+            </div>
+            
+            <h1 class="text-white text-xl font-semibold mb-2">Sign Out</h1>
+            <p class="text-white/50 text-sm mb-6">Are you sure you want to sign out of your account?</p>
+
+            <form method="post" action="{% url 'account_logout' %}">
+                {% csrf_token %}
+                {% if redirect_field_value %}
+                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+                {% endif %}
+                <div class="space-y-3">
+                    <button type="submit" class="danger-btn">Sign Out</button>
+                    <a href="javascript:history.back()" class="secondary-btn">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

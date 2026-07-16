@@ -1,94 +1,27 @@
-{% load i18n %}
+{% load i18n static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In — MyStore</title>
-    <meta name="description" content="Sign in to your MyStore account securely with Google.">
+    <title>Sign In — EvoCart</title>
+    <meta name="description" content="Sign in to your EvoCart account securely with Google.">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * { font-family: 'Inter', sans-serif; }
-
-        .auth-bg {
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            min-height: 100vh;
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
-        }
-
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.15;
-            animation: drift 8s ease-in-out infinite alternate;
-        }
-        .orb-1 { width: 400px; height: 400px; background: #6366f1; top: -100px; left: -100px; }
-        .orb-2 { width: 300px; height: 300px; background: #8b5cf6; bottom: -50px; right: -50px; animation-delay: -4s; }
-
-        @keyframes drift {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(30px, 20px) scale(1.05); }
-        }
-
-        .google-btn {
-            background: white;
-            color: #1f1f1f;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        }
-        .google-btn:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-            transform: translateY(-1px);
-        }
-        .google-btn:active { transform: translateY(0); }
-
-        .brand-dot {
-            width: 8px; height: 8px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 6px;
-        }
-
-        .divider {
-            display: flex; align-items: center; gap: 12px;
-        }
-        .divider::before, .divider::after {
-            content: ''; flex: 1;
-            height: 1px;
-            background: rgba(255,255,255,0.1);
-        }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(24px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        .fade-up { animation: fadeUp 0.6s ease forwards; }
-        .fade-up-delay { animation: fadeUp 0.6s 0.15s ease both; }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
 </head>
-<body class="auth-bg flex items-center justify-center p-4 relative overflow-hidden">
-
-    <!-- Ambient orbs -->
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
+<body class="auth-bg flex items-center justify-center min-h-screen p-4 md:p-8 relative">
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <!-- Ambient orbs -->
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
 
     <div class="w-full max-w-md relative z-10">
 
         <!-- Logo / Brand -->
         <div class="text-center mb-8 fade-up">
             <a href="/" class="inline-flex items-center text-white text-2xl font-bold tracking-tight">
-                <span class="brand-dot"></span>MyStore
+                <span class="brand-dot"></span>EvoCart
             </a>
             <p class="mt-2 text-sm text-white/40">Premium shopping experience</p>
         </div>

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.urls import reverse
@@ -37,6 +38,13 @@ class Brand(TimeStampField):
 class Product(TimeStampField):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=225, unique=True)
+    seller = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="products",
+        null=True,
+        blank=True,
+    )
 
     description = models.TextField(blank=True)
 
