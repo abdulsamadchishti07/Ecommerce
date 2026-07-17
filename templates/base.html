@@ -83,6 +83,25 @@
             const isOpen = navLinks.classList.toggle('open');
             toggle.setAttribute('aria-expanded', isOpen);
         });
+
+        // Auto-dismiss Django messages after 5 seconds
+        function setupMessageDismissal() {
+            document.querySelectorAll('.message-alert').forEach((alert) => {
+                if (alert.dataset.dismissed) return; // Prevent duplicate timers
+                alert.dataset.dismissed = 'true';
+                
+                setTimeout(() => {
+                    alert.classList.add('message-alert--fade');
+                    setTimeout(() => alert.remove(), 300); // wait for fade transition, then remove from DOM
+                }, 5000);
+            });
+        }
+        
+        // Run on initial load
+        setupMessageDismissal();
+        
+        // Run after HTMX swaps
+        document.body.addEventListener('htmx:afterSwap', setupMessageDismissal);
     </script>
 
 </body>

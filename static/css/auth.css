@@ -127,6 +127,15 @@ body, .auth-bg {
     transition: all 0.3s;
 }
 
+.message-alert {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 1;
+}
+.message-alert--fade {
+    opacity: 0;
+    transform: translateY(-8px);
+}
+
 /* Animations */
 @keyframes fadeUp {
     from { opacity: 0; transform: translateY(20px); }

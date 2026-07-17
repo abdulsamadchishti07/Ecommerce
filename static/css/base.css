@@ -179,6 +179,12 @@ main.site-main { flex: 1; padding-block: 2rem; }
   font-size: 0.875rem;
   font-weight: 500;
   margin-bottom: 1rem;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  opacity: 1;
+}
+.message-alert--fade {
+  opacity: 0;
+  transform: translateY(-8px);
 }
 .message-alert--info    { background: var(--bg-info);    color: var(--color-info);    border-color: var(--color-info); }
 .message-alert--success { background: var(--bg-success); color: var(--color-success); border-color: var(--color-success); }

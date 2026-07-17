@@ -3,8 +3,14 @@ from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 # pyrefly: ignore [missing-import]
 from allauth.account.models import EmailAddress
 from django.contrib.auth import get_user_model
+# pyrefly: ignore [missing-import]
+from allauth.core.exceptions import ImmediateHttpResponse
+from django.contrib import messages
+from django.shortcuts import redirect
+
 
 User = get_user_model()
+
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     def pre_social_login(self, request, sociallogin):
@@ -35,4 +41,5 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
                 email_address.save()
                 
         except User.DoesNotExist:
-            pass
+            messages.error(request, "This email does not have an account.")
+            raise ImmediateHttpResponse(redirect('account_login'))

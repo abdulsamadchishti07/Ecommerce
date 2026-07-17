@@ -29,6 +29,16 @@
             <h1 class="text-white text-xl font-semibold mb-1">Sign in</h1>
             <p class="text-white/40 text-sm mb-6">Use your email or Google account</p>
 
+            {% if messages %}
+                <div class="mb-4">
+                    {% for message in messages %}
+                        <div class="message-alert px-3 py-2 rounded-lg {% if message.tags == 'error' %}bg-red-500/10 border border-red-500/20 text-red-400{% else %}bg-indigo-500/10 border border-indigo-500/20 text-indigo-400{% endif %} text-xs mb-2">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
             <!-- Google OAuth -->
             <form method="post" action="{% provider_login_url 'google' %}">
                 {% csrf_token %}
@@ -85,7 +95,7 @@
                 </div>
 
                 {% if form.non_field_errors %}
-                    <div class="mb-4 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/20">
+                    <div class="message-alert mb-4 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/20">
                         <p class="text-red-400 text-xs">{{ form.non_field_errors|first }}</p>
                     </div>
                 {% endif %}
@@ -108,5 +118,22 @@
             <a href="#" class="text-white/35 hover:text-white/60 underline underline-offset-2 transition-colors">Terms</a>
         </p>
     </div>
+    
+    <script>
+        // Auto-dismiss Django messages after 5 seconds
+        function setupMessageDismissal() {
+            document.querySelectorAll('.message-alert').forEach((alert) => {
+                if (alert.dataset.dismissed) return;
+                alert.dataset.dismissed = 'true';
+                
+                setTimeout(() => {
+                    alert.classList.add('message-alert--fade');
+                    setTimeout(() => alert.remove(), 300);
+                }, 5000);
+            });
+        }
+        setupMessageDismissal();
+        document.body.addEventListener('htmx:afterSwap', setupMessageDismissal);
+    </script>
 </body>
 </html>

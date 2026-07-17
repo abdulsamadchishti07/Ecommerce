@@ -172,11 +172,45 @@ AUTHENTICATION_BACKENDS = [
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
-ACCOUNT_EMAIL_VERIFICATION = "optional"   # send verification email but don't block login
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_VERIFICATION_BY_CODE_ENABLED = True  # send 6-digit OTP instead of link
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 LOGIN_REDIRECT_URL = "/"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
+
+# Forgot-password flow: send a 6-digit code by email (same UX as signup OTP)
+# instead of allauth's default "click this link" reset flow.
+ACCOUNT_PASSWORD_RESET_BY_CODE_ENABLED = True
+
+# How long an email-verification / password-reset code stays valid, and how
+# many wrong attempts are allowed before it's rejected. Tune as you like.
+ACCOUNT_EMAIL_VERIFICATION_BY_CODE_TIMEOUT = 2 * 60  # 2minutes
+ACCOUNT_EMAIL_VERIFICATION_BY_CODE_MAX_ATTEMPTS = 3
+ACCOUNT_PASSWORD_RESET_BY_CODE_TIMEOUT = 2 * 60  # 2 minutes
+ACCOUNT_PASSWORD_RESET_BY_CODE_MAX_ATTEMPTS = 3
+
+# --- Email sending (Gmail SMTP) ---
+# Real emails only go out when EMAIL_HOST_USER / EMAIL_HOST_PASSWORD are set
+# in .env. If they're missing, we fall back to the console backend so the
+# project never crashes for a dev who hasn't set up Gmail yet - you get a
+# clear signal instead of a silent failure.
+EMAIL_HOST = config("EMAIL_HOST", default="smtp.gmail.com")
+EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default=EMAIL_HOST_USER or "webmaster@localhost")
+# Fail fast instead of hanging forever if Gmail's SMTP server doesn't respond.
+EMAIL_TIMEOUT = 10
+
+if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+else:
+    # No Gmail credentials configured yet -> emails print to the terminal
+    # instead of being sent. Set EMAIL_HOST_USER/EMAIL_HOST_PASSWORD in .env
+    # to switch on real delivery.
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # Auto-connect Google accounts to existing Django users with the same email
 # (Prevents the intermediate "/accounts/social/signup/" page for existing users)
@@ -191,4 +225,8 @@ SOCIALACCOUNT_PROVIDERS = {
         "OAUTH_PKCE_ENABLED": True,
         "VERIFIED_EMAIL": True,
     }
+}
+
+ACCOUNT_FORMS = {
+    'login': 'apps.accounts.forms.CustomLoginForm',
 }
