@@ -7,7 +7,7 @@
     <title>Sign Out — EvoCart</title>
     <meta name="description" content="Sign out of your EvoCart account.">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}?v=2">
 </head>
 <body class="flex items-center justify-center min-h-screen p-4 md:p-8 relative">
     <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
@@ -26,10 +26,10 @@
         </div>
 
         <div class="glass-card rounded-2xl p-8 fade-up-d text-center">
-            <div class="w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center mx-auto mb-5">
-                <svg class="h-8 w-8 text-rose-500" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
-                </svg>
+            <div class="flex justify-center mb-5">
+                <div style="width:64px;height:64px;border-radius:50%;background:rgba(225,29,72,0.15);border:1.5px solid rgba(225,29,72,0.35);display:flex;align-items:center;justify-content:center;">
+                    <img src="{% static 'icons/accounts/logout red.png' %}" width="28" height="28" alt="">
+                </div>
             </div>
             
             <h1 class="text-white text-xl font-semibold mb-2">Sign Out</h1>

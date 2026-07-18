@@ -1,0 +1,52 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Cancelled — EvoCart</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}?v=2">
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 md:p-8 relative">
+    <!-- background orbs -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <div class="w-full max-w-md relative z-10">
+        <!-- Brand -->
+        <div class="text-center mb-7 fade-up">
+            <a href="/" class="inline-flex items-center text-white text-2xl font-bold">
+                <span class="brand-dot"></span>
+                EvoCart
+            </a>
+        </div>
+
+        <div class="glass-card rounded-2xl p-8 fade-up-d text-center">
+
+            <!-- Cancel Icon -->
+            <div class="flex justify-center mb-5">
+                <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;">
+                    <img src="{% static 'icons/accounts/google.png' %}" width="28" height="28" alt="Google">
+                </div>
+            </div>
+
+            <h1 class="text-white text-xl font-semibold mb-2">Login Cancelled</h1>
+            <p class="text-white/50 text-sm mb-8">
+                You decided to cancel the login process. If this was a mistake, you can easily try again.
+            </p>
+
+            <div class="flex flex-col gap-3">
+                <a href="{% url 'account_login' %}" class="primary-btn block w-fulnl text-center" style="line-height:40px; text-decoration:none;">
+                    Return to Sign In
+                </a>
+                <a href="{% url 'account_signup' %}" class="block text-center text-white/50 hover:text-white/80 text-sm transition-colors py-2" style="text-decoration:none;">
+                    Create a new account
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

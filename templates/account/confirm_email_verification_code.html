@@ -1,0 +1,238 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification — EvoCart</title>
+    <meta name="description" content="Enter the verification code sent to your email to activate your EvoCart account.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}?v=3">
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 md:p-8 relative">
+    <!-- background orbs -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <div class="w-full max-w-md relative z-10">
+        <!-- Brand -->
+        <div class="text-center mb-7 fade-up">
+            <a href="/" class="inline-flex items-center text-white text-2xl font-bold">
+                <span style="width:8px;height:8px;border-radius:50%;background:#FF6A3D;display:inline-block;margin-right:8px;"></span>
+                EvoCart
+            </a>
+            <p class="text-white/35 text-sm mt-1">Account verification</p>
+        </div>
+
+        <div class="glass-card rounded-2xl p-8 fade-up-d">
+
+            <!-- Icon -->
+            <div class="flex justify-center mb-5">
+                <div style="width:64px;height:64px;border-radius:50%;background:rgba(36,84,224,0.15);border:1.5px solid rgba(36,84,224,0.35);display:flex;align-items:center;justify-content:center;">
+                    <svg width="28" height="28" fill="none" viewBox="0 0 24 24">
+                        <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </div>
+
+            <h1 class="text-white text-xl font-semibold text-center mb-1">Check your inbox</h1>
+            <p class="text-white/40 text-sm text-center mb-4">We sent a 6-digit code to</p>
+
+            <!-- Email chip -->
+            <div class="flex justify-center">
+                <div class="email-chip">
+                    <svg width="13" height="13" fill="none" viewBox="0 0 24 24">
+                        <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        <rect x="3" y="6" width="18" height="13" rx="2" stroke="#818cf8" stroke-width="1.8"/>
+                    </svg>
+                    {{ email }}
+                </div>
+            </div>
+
+            <!-- Timer -->
+            <div class="timer-ring flex justify-center">
+                <span class="timer-dot"></span>
+                <span id="timer-label">Code expires in <strong id="countdown">02:00</strong></span>
+            </div>
+
+            <!-- Allauth form (hidden native input) -->
+            <form method="post" action="{% url 'account_email_verification_sent' %}" id="verify-form">
+                {% csrf_token %}
+                {{ verify_form.code }}     {# renders as <input id="id_code"> which we hide #}
+                {{ redirect_field }}
+
+                <!-- OTP digit boxes -->
+                <div class="otp-wrapper" id="otp-boxes">
+                    {% for i in "123456" %}
+                        <input type="text"
+                               inputmode="numeric"
+                               maxlength="1"
+                               pattern="[0-9]"
+                               class="otp-box"
+                               id="otp-digit-{{ forloop.counter }}"
+                               autocomplete="{% if forloop.first %}one-time-code{% else %}off{% endif %}"
+                               aria-label="Digit {{ forloop.counter }} of 6">
+                    {% endfor %}
+                </div>
+
+                {% if verify_form.code.errors %}
+                    <div class="mb-4 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/20 text-center">
+                        <p class="text-red-400 text-xs">{{ verify_form.code.errors|first }}</p>
+                    </div>
+                {% endif %}
+
+                <button type="submit" id="confirm-btn" class="primary-btn" disabled
+                        style="opacity:0.5;cursor:not-allowed;">
+                    Verify Email
+                </button>
+            </form>
+
+            <!-- Resend form -->
+            <form id="resend" method="post" action="{% url 'account_email_verification_sent' %}" onsubmit="sessionStorage.removeItem('otpEndTime_{{ email|escapejs }}');">
+                <input type="hidden" name="action" value="resend">
+                {{ redirect_field }}
+                {% csrf_token %}
+            </form>
+
+            <!-- Logout-from-stage form (cancel) -->
+            <form id="logout-from-stage" method="post" action="{% url 'account_logout' %}">
+                <input type="hidden" name="next" value="{% url 'account_signup' %}">
+                {% csrf_token %}
+            </form>
+
+            <!-- Action row -->
+            <div class="flex items-center justify-between mt-5 pt-4 border-t border-white/10">
+                <button class="resend-btn" id="resend-btn" onclick="document.getElementById('resend').submit()">
+                    Resend code
+                </button>
+                <button class="text-white/30 hover:text-white/60 text-xs transition-colors"
+                        style="background:none;border:none;cursor:pointer;"
+                        onclick="document.getElementById('logout-from-stage').submit()">
+                    Use different email
+                </button>
+            </div>
+        </div>
+
+        <p class="text-center text-white/20 text-xs mt-5">
+            Protected by
+            <a href="#" class="text-white/35 hover:text-white/60 underline underline-offset-2 transition-colors">Privacy Policy</a>
+            ·
+            <a href="#" class="text-white/35 hover:text-white/60 underline underline-offset-2 transition-colors">Terms</a>
+        </p>
+    </div>
+
+    <script>
+        // ── OTP box logic ──────────────────────────────────────────────
+        const digits  = Array.from({ length: 6 }, (_, i) => document.getElementById(`otp-digit-${i + 1}`));
+        const hidden  = document.getElementById('id_code');
+        const submit  = document.getElementById('confirm-btn');
+
+        function syncHidden() {
+            const val = digits.map(d => d.value).join('');
+            hidden.value = val;
+            const full = val.length === 6;
+            submit.disabled = !full;
+            submit.style.opacity = full ? '1' : '0.5';
+            submit.style.cursor  = full ? 'pointer' : 'not-allowed';
+        }
+
+        digits.forEach((box, idx) => {
+            // Highlight filled state
+            box.addEventListener('input', e => {
+                // Accept only digits
+                box.value = box.value.replace(/\D/g, '').slice(-1);
+                box.classList.toggle('filled', box.value !== '');
+
+                // Auto-advance
+                if (box.value && idx < 5) digits[idx + 1].focus();
+                syncHidden();
+            });
+
+            // Handle paste on any box (paste full code)
+            box.addEventListener('paste', e => {
+                e.preventDefault();
+                const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+                text.split('').forEach((ch, i) => {
+                    if (digits[i]) {
+                        digits[i].value = ch;
+                        digits[i].classList.add('filled');
+                    }
+                });
+                syncHidden();
+                const next = digits[Math.min(text.length, 5)];
+                if (next) next.focus();
+            });
+
+            // Backspace moves back
+            box.addEventListener('keydown', e => {
+                if (e.key === 'Backspace' && !box.value && idx > 0) {
+                    digits[idx - 1].focus();
+                }
+                // Arrow navigation
+                if (e.key === 'ArrowLeft' && idx > 0) digits[idx - 1].focus();
+                if (e.key === 'ArrowRight' && idx < 5) digits[idx + 1].focus();
+            });
+        });
+
+        // Auto-focus first box on load
+        digits[0].focus();
+
+        // Submit on Enter when all 6 filled
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && hidden.value.length === 6) {
+                document.getElementById('verify-form').submit();
+            }
+        });
+
+        // ── Countdown timer ────────────────────────────────────────────
+        const storageKey = 'otpEndTime_{{ email|escapejs }}';
+        const now = Math.floor(Date.now() / 1000);
+        let seconds = 2 * 60; // 2 minutes
+        let endTime = sessionStorage.getItem(storageKey);
+
+        if (!endTime) {
+            endTime = now + seconds;
+            sessionStorage.setItem(storageKey, endTime);
+        } else {
+            seconds = endTime - now;
+        }
+        
+        if (seconds < 0) seconds = 0;
+
+        const countdownEl = document.getElementById('countdown');
+        const timerLabel  = document.getElementById('timer-label');
+        const resendBtn   = document.getElementById('resend-btn');
+
+        const tick = setInterval(() => {
+            seconds--;
+            if (seconds <= 0) {
+                clearInterval(tick);
+                countdownEl.textContent = '00:00';
+                timerLabel.innerHTML = '<span style="color:#ef4444;">Code expired.</span>';
+                resendBtn.disabled = false;
+                submit.disabled = true;
+                submit.style.opacity = '0.5';
+                return;
+            }
+            const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+            const s = String(seconds % 60).padStart(2, '0');
+            countdownEl.textContent = `${m}:${s}`;
+        }, 1000);
+
+        // ── Auto-dismiss messages ──────────────────────────────────────
+        function setupMessageDismissal() {
+            document.querySelectorAll('.message-alert').forEach(alert => {
+                if (alert.dataset.dismissed) return;
+                alert.dataset.dismissed = 'true';
+                setTimeout(() => {
+                    alert.classList.add('message-alert--fade');
+                    setTimeout(() => alert.remove(), 300);
+                }, 5000);
+            });
+        }
+        setupMessageDismissal();
+    </script>
+</body>
+</html>

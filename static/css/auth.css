@@ -56,6 +56,55 @@ body, .auth-bg {
     text-transform: uppercase;
 }
 
+/* ── Icon-prefixed input wrappers ──────────────────────────────── */
+.input-icon-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon-wrap .field-icon {
+    position: absolute;
+    left: 12px;
+    width: 18px !important;
+    height: 18px !important;
+    max-width: 18px !important;
+    max-height: 18px !important;
+    opacity: 0.4;
+    filter: invert(1);
+    pointer-events: none;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+
+.input-icon-wrap .field-input {
+    padding-left: 40px;       /* make room for left icon */
+}
+
+/* when there's also a right toggle button */
+.input-icon-wrap .field-input.has-toggle {
+    padding-right: 42px;
+}
+
+.pw-toggle {
+    position: absolute;
+    right: 11px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    opacity: 0.35;
+    transition: opacity 0.2s;
+}
+.pw-toggle:hover { opacity: 0.7; }
+.pw-toggle img {
+    width: 18px;
+    height: 18px;
+    filter: invert(1);
+}
+
 .primary-btn, .submit-btn {
     background: #2454E0;
     color: white; width: 100%; padding: 12px;
@@ -197,6 +246,90 @@ body, .auth-bg {
     display: inline-block;
     margin-right: 6px;
 }
+
+/* OTP input boxes */
+.otp-wrapper {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    width: 100%;
+}
+.otp-box {
+    flex: 1;
+    min-width: 0;
+    max-width: 52px;
+    height: 60px;
+    background: rgba(255,255,255,0.07);
+    border: 1.5px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    caret-color: #FF6A3D;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    outline: none;
+}
+.otp-box:focus {
+    border-color: #2454E0;
+    background: rgba(36,84,224,0.12);
+    box-shadow: 0 0 0 3px rgba(36,84,224,0.20);
+}
+.otp-box.filled {
+    border-color: rgba(255,255,255,0.30);
+}
+
+/* hidden real input that allauth needs */
+#id_code { display: none; }
+
+/* countdown ring */
+.timer-ring {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 16px;
+}
+.timer-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #FF6A3D;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.4; transform: scale(0.75); }
+}
+
+/* resend link button */
+.resend-btn {
+    background: none;
+    border: none;
+    color: #818cf8;
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.15s;
+}
+.resend-btn:hover { color: #a5b4fc; }
+.resend-btn:disabled { color: rgba(255,255,255,0.25); cursor: not-allowed; }
+
+.email-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(36,84,224,0.15);
+    border: 1px solid rgba(36,84,224,0.3);
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    color: #a5b4fc;
+    margin-bottom: 20px;
+}
+.email-chip svg { flex-shrink: 0; }
 
 /* =============================================
    RESPONSIVE — Mobile first

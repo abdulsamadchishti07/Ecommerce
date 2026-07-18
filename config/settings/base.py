@@ -172,8 +172,9 @@ AUTHENTICATION_BACKENDS = [
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"   # must be verified
 ACCOUNT_EMAIL_VERIFICATION_BY_CODE_ENABLED = True  # send 6-digit OTP instead of link
+ACCOUNT_PREVENT_ENUMERATION = False # Throw an error if email already exists on signup
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 LOGIN_REDIRECT_URL = "/"
@@ -187,6 +188,7 @@ ACCOUNT_PASSWORD_RESET_BY_CODE_ENABLED = True
 # many wrong attempts are allowed before it's rejected. Tune as you like.
 ACCOUNT_EMAIL_VERIFICATION_BY_CODE_TIMEOUT = 2 * 60  # 2minutes
 ACCOUNT_EMAIL_VERIFICATION_BY_CODE_MAX_ATTEMPTS = 3
+ACCOUNT_EMAIL_VERIFICATION_BY_CODE_FORMAT = {"numeric": True, "length": 6, "dashed": False}  # clean 6-digit OTP
 ACCOUNT_PASSWORD_RESET_BY_CODE_TIMEOUT = 2 * 60  # 2 minutes
 ACCOUNT_PASSWORD_RESET_BY_CODE_MAX_ATTEMPTS = 3
 
