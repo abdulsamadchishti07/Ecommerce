@@ -145,61 +145,7 @@ class ProfileModelTests(TestCase):
         self.assertFalse(Profile.objects.filter(pk=pk).exists())
 
 
-# ===========================================================================
-# 3. Address Model
-# ===========================================================================
 
-class AddressModelTests(TestCase):
-
-    def setUp(self):
-        self.user = User.objects.create_user(email="addr@b.com", password="pw")
-
-    def test_create_billing_address(self):
-        from apps.accounts.models import Address
-        a = Address.objects.create(
-            user=self.user,
-            address_type="B",
-            street_address="123 Main St",
-            city="Karachi",
-            state="Sindh",
-            postal_code="75000",
-            country="Pakistan",
-        )
-        self.assertIn("Billing", str(a))
-
-    def test_create_shipping_address(self):
-        from apps.accounts.models import Address
-        a = Address.objects.create(
-            user=self.user,
-            address_type="S",
-            street_address="456 Park Ave",
-            city="Lahore",
-            state="Punjab",
-            postal_code="54000",
-            country="Pakistan",
-        )
-        self.assertEqual(a.get_address_type_display(), "Shipping")
-
-    def test_address_cascade_delete(self):
-        from apps.accounts.models import Address
-        a = Address.objects.create(
-            user=self.user, address_type="B",
-            street_address="1 St", city="C", state="S",
-            postal_code="1", country="PK",
-        )
-        pk = a.pk
-        self.user.delete()
-        self.assertFalse(Address.objects.filter(pk=pk).exists())
-
-    def test_user_can_have_multiple_addresses(self):
-        from apps.accounts.models import Address
-        for t in ("B", "S"):
-            Address.objects.create(
-                user=self.user, address_type=t,
-                street_address="1 St", city="C", state="S",
-                postal_code="1", country="PK",
-            )
-        self.assertEqual(self.user.addresses.count(), 2)
 
 
 # ===========================================================================
@@ -209,6 +155,7 @@ class AddressModelTests(TestCase):
 class CustomLoginFormTests(SocialAppMixin, TestCase):
 
     def setUp(self):
+        super().setUp()
         self.user = make_user("login@b.com", "GoodPass99!")
 
     def test_unknown_email_raises_validation_error(self):
@@ -223,9 +170,12 @@ class CustomLoginFormTests(SocialAppMixin, TestCase):
         """The form should NOT raise 'does not have an account' for a real email
         (allauth may still fail on wrong password, but that's a different error)."""
         from apps.accounts.forms import CustomLoginForm
+        from django.test import RequestFactory
+        req = RequestFactory().post('/login/')
         form = CustomLoginForm(
             data={"login": "login@b.com", "password": "WrongPass!"}
         )
+        form.request = req
         # The custom check passes; allauth's own clean will reject the password
         errors = str(form.errors)
         self.assertNotIn("Does not have an account.", errors)
@@ -258,11 +208,10 @@ class ProfileViewTests(TestCase):
         self.client.get(self.url)
         self.assertTrue(Profile.objects.filter(user=self.user).exists())
 
-    def test_context_contains_profile_and_addresses(self):
+    def test_context_contains_profile(self):
         self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertIn("profile", response.context)
-        self.assertIn("addresses", response.context)
 
 
 # ===========================================================================
@@ -322,6 +271,7 @@ class DeleteAccountViewTests(TestCase):
 class SignupFlowTests(SocialAppMixin, TestCase):
 
     def setUp(self):
+        super().setUp()
         self.client = Client()
         self.url = reverse("account_signup")
 
@@ -385,6 +335,7 @@ class SignupFlowTests(SocialAppMixin, TestCase):
 class LoginFlowTests(SocialAppMixin, TestCase):
 
     def setUp(self):
+        super().setUp()
         self.client = Client()
         self.url = reverse("account_login")
         self.user = make_user("auth@evocart.com", "GoodPass99!")
@@ -581,6 +532,46 @@ class TemplateSmokTests(SocialAppMixin, TestCase):
     def test_password_reset_page_renders(self):
         response = self.client.get(reverse("account_reset_password"))
         self.assertEqual(response.status_code, 200)
+
+# ===========================================================================
+# 13. Dashboard Features (Profile & Addresses)
+# ===========================================================================
+
+class ProfileUpdateTests(TestCase):
+    def setUp(self):
+        self.user = make_user("dash@test.com", "Password123!")
+        self.client.login(email="dash@test.com", password="Password123!")
+
+    def test_profile_update_view(self):
+        url = reverse("profile_edit")
+        # GET should load the form
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # POST should update profile and address fields
+        response = self.client.post(url, {
+            "first_name": "Dash",
+            "last_name": "Board",
+            "bio": "I love buying things.",
+            "street_address": "456 Market St",
+            "city": "San Francisco",
+            "state": "CA",
+            "postal_code": "94103",
+            "country": "USA"
+        })
+        self.assertRedirects(response, reverse("profile"))
+        
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.first_name, "Dash")
+        self.assertEqual(self.user.last_name, "Board")
+        self.assertEqual(self.user.profile.bio, "I love buying things.")
+        self.assertEqual(self.user.profile.street_address, "456 Market St")
+        self.assertEqual(self.user.profile.city, "San Francisco")
+
+
+class AuthRequiredTests(TestCase):
+    def setUp(self):
+        self.client = Client()
 
     def test_profile_page_requires_auth(self):
         response = self.client.get(reverse("profile"))

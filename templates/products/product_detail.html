@@ -21,7 +21,7 @@
                 · Seller: {{ product.seller.email }}
             {% endif %}
         </p>
-        <p class="text-2xl text-indigo-600 font-bold mt-4">${{ product.price }}</p>
+        <p class="text-2xl text-indigo-600 font-bold mt-4">Rs {{ product.price }}</p>
         <p class="mt-4 text-gray-700">{{ product.description }}</p>
 
         {% if product.variants.all %}
@@ -30,7 +30,7 @@
                 <div class="flex gap-2 flex-wrap">
                     {% for variant in product.variants.all %}
                         <span class="border rounded px-3 py-1 text-sm">
-                            {{ variant.size }} / {{ variant.color }} — ${{ variant.price }}
+                            {{ variant.size }} / {{ variant.color }} — Rs {{ variant.price }}
                         </span>
                     {% endfor %}
                 </div>

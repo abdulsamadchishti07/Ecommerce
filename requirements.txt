@@ -13,3 +13,4 @@ django-htmx==1.18.0
 whitenoise==6.6.0
 django-allauth
 PyJWT[crypto]
+django-countries==7.5.1

@@ -41,8 +41,10 @@
             <ul class="nav-links" id="nav-links">
                 <li><a href="{% url 'products:home' %}">Shop</a></li>
                 {% if user.is_authenticated %}
+                    {% if user.profile.role == 'S' %}
+                        <li><a href="{% url 'products:product_add' %}">Add Product</a></li>
+                    {% endif %}
                     <li><a href="{% url 'profile' %}">Account</a></li>
-                    <li><a href="{% url 'account_logout' %}">Logout</a></li>
                 {% else %}
                     <li><a href="{% url 'account_login' %}">Login</a></li>
                 {% endif %}

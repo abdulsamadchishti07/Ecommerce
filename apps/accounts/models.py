@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+# pyrefly: ignore [missing-import]
+from django_countries.fields import CountryField
 
 
 class UserManager(BaseUserManager):
@@ -48,24 +50,17 @@ class Profile(models.Model):
     avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
     bio = models.TextField(blank=True)
     role = models.CharField(max_length=1, choices=ROLE_CHOICES, default="B")
+    
+    # Address fields
+    street_address = models.CharField(max_length=255, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    state = models.CharField(max_length=100, blank=True)
+    postal_code = models.CharField(max_length=20, blank=True)
+    country = CountryField(blank=True, null=True)
+
+    # Shop fields (for sellers)
+    shop_name = models.CharField(max_length=100, blank=True)
+    shop_description = models.TextField(blank=True)
 
     def __str__(self):
         return f"{self.user.email}'s Profile ({self.get_role_display()})"
-
-
-class Address(models.Model):
-    ADDRESS_CHOICES = (
-        ("B", "Billing"),
-        ("S", "Shipping"),
-    )
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="addresses")
-    address_type = models.CharField(max_length=1, choices=ADDRESS_CHOICES)
-    is_default = models.BooleanField(default=False)
-    street_address = models.CharField(max_length=255)
-    city = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
-    postal_code = models.CharField(max_length=20)
-    country = models.CharField(max_length=100)
-
-    def __str__(self):
-        return f"{self.user.email} - {self.get_address_type_display()} Address"

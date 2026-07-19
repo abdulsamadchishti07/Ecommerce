@@ -39,9 +39,9 @@
                 {% csrf_token %}
                 <input type="hidden" name="process" value="login">
                 <button type="submit" id="google-signin-btn" class="google-btn w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl font-medium text-sm">
-
+                    <img src="{% static 'icons/accounts/google.png' %}" width="20" height="20" alt="Google">
                     Continue with Google
-                </button>
+                </button>i
             </form>
 
             <div class="divider my-6">
