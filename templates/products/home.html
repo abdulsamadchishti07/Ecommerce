@@ -16,7 +16,13 @@
             </div>
             <p class="font-semibold truncate">{{ product.name }}</p>
             <p class="text-gray-500 text-sm truncate">{{ product.category }}</p>
-            <p class="text-indigo-600 font-bold mt-2">Rs {{ product.price }}</p>
+            <div class="flex items-center gap-2 mt-2 flex-wrap">
+                <span class="text-indigo-600 font-bold">Rs {{ product.price }}</span>
+                {% if product.is_on_sale %}
+                    <span class="text-gray-400 line-through text-xs">Rs {{ product.old_price }}</span>
+                    <span class="bg-red-100 text-red-700 text-xs font-semibold px-1.5 py-0.5 rounded">-{{ product.discount_percent }}%</span>
+                {% endif %}
+            </div>
         </a>
     {% empty %}
         <p class="text-gray-500">No products yet — add some in the admin.</p>

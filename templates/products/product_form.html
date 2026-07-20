@@ -1,76 +1,137 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Add New Product — EvoCart{% endblock %}
+{% block title %}{% if mode == 'edit' %}Edit Product{% else %}Add New Product{% endif %} — EvoCart{% endblock %}
 
 {% block content %}
 <div class="max-w-3xl mx-auto py-12 px-4">
     <div class="mb-8 flex items-center justify-between">
         <div>
-            <h1 class="text-3xl font-bold tracking-tight text-gray-900">Add New Product</h1>
-            <p class="mt-2 text-sm text-gray-500">List a new product for sale in your shop.</p>
+            <h1 class="text-3xl font-bold tracking-tight text-gray-900">
+                {% if mode == 'edit' %}Edit Product{% else %}Add New Product{% endif %}
+            </h1>
+            <p class="mt-2 text-sm text-gray-500">
+                {% if mode == 'edit' %}
+                    Update the details of <strong>{{ product.name }}</strong>.
+                {% else %}
+                    List a new product for sale in your shop.
+                {% endif %}
+            </p>
         </div>
     </div>
 
     <div class="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
         <form action="." method="POST" enctype="multipart/form-data" class="px-4 py-6 sm:p-8">
             {% csrf_token %}
-            
+
             <div class="space-y-8">
-                <!-- Name -->
-                <div>
-                    <label for="id_name" class="block text-sm font-medium leading-6 text-gray-900">Product Name</label>
-                    <div class="mt-2">
-                        {{ form.name }}
-                    </div>
-                    {% if form.name.errors %}
-                        <p class="mt-2 text-sm text-red-600">{{ form.name.errors|first }}</p>
-                    {% endif %}
-                </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Price -->
-                    <div>
-                        <label for="id_price" class="block text-sm font-medium leading-6 text-gray-900">Price (PKR)</label>
-                        <div class="mt-2 relative rounded-md shadow-sm">
-                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                <span class="text-gray-500 sm:text-sm">Rs</span>
-                            </div>
-                            <input type="number" name="price" id="id_price" step="0.01" min="0" required
-                                class="block w-full rounded-md border-0 py-1.5 pl-8 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" 
-                                placeholder="0.00" value="{{ form.price.value|default:'' }}">
-                        </div>
-                        {% if form.price.errors %}
-                            <p class="mt-2 text-sm text-red-600">{{ form.price.errors|first }}</p>
-                        {% endif %}
-                    </div>
-                    
-                    <!-- Category -->
-                    <div>
-                        <label for="id_category_name" class="block text-sm font-medium leading-6 text-gray-900">Category</label>
+                <!-- ── Section: Basic Info ── -->
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">Basic Information</h2>
+
+                    <!-- Name -->
+                    <div class="mb-6">
+                        <label for="id_name" class="block text-sm font-medium leading-6 text-gray-900">Product Name</label>
                         <div class="mt-2">
-                            {{ form.category_name }}
+                            {{ form.name }}
                         </div>
-                        {% if form.category_name.errors %}
-                            <p class="mt-2 text-sm text-red-600">{{ form.category_name.errors|first }}</p>
+                        {% if form.name.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.name.errors|first }}</p>
                         {% endif %}
                     </div>
-                </div>
 
-                <!-- Brand -->
-                <div>
-                    <label for="id_brand_name" class="block text-sm font-medium leading-6 text-gray-900">Brand (Optional)</label>
-                    <div class="mt-2">
-                        {{ form.brand_name }}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <!-- New / Sale Price -->
+                        <div>
+                            <label for="id_price" class="block text-sm font-medium leading-6 text-gray-900">Sale / New Price (PKR) *</label>
+                            <div class="mt-2 relative rounded-md shadow-sm">
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                    <span class="text-gray-500 sm:text-sm">Rs</span>
+                                </div>
+                                <input type="number" name="price" id="id_price" step="0.01" min="0" required
+                                    class="block w-full rounded-md border-0 py-1.5 pl-8 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    placeholder="0.00" value="{{ form.price.value|default:'' }}">
+                            </div>
+                            {% if form.price.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.price.errors|first }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Original / Old Price -->
+                        <div>
+                            <label for="id_old_price" class="block text-sm font-medium leading-6 text-gray-900">Original / Old Price (PKR) <span class="text-xs text-gray-500 font-normal">(Optional for discount)</span></label>
+                            <div class="mt-2 relative rounded-md shadow-sm">
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                    <span class="text-gray-500 sm:text-sm">Rs</span>
+                                </div>
+                                <input type="number" name="old_price" id="id_old_price" step="0.01" min="0"
+                                    class="block w-full rounded-md border-0 py-1.5 pl-8 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    placeholder="e.g. 25000.00" value="{{ form.old_price.value|default:'' }}">
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">Must be higher than the Sale Price to show a discount strike-through.</p>
+                            {% if form.old_price.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.old_price.errors|first }}</p>
+                            {% endif %}
+                        </div>
                     </div>
-                    {% if form.brand_name.errors %}
-                        <p class="mt-2 text-sm text-red-600">{{ form.brand_name.errors|first }}</p>
-                    {% endif %}
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <!-- Category -->
+                        <div>
+                            <label for="id_category_name" class="block text-sm font-medium leading-6 text-gray-900">Category *</label>
+                            <div class="mt-2">
+                                {{ form.category_name }}
+                            </div>
+                            {% if form.category_name.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.category_name.errors|first }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Brand -->
+                        <div>
+                            <label for="id_brand_name" class="block text-sm font-medium leading-6 text-gray-900">Brand (Optional)</label>
+                            <div class="mt-2">
+                                {{ form.brand_name }}
+                            </div>
+                            {% if form.brand_name.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.brand_name.errors|first }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-6">
+                        <label for="id_description" class="block text-sm font-medium leading-6 text-gray-900">Description</label>
+                        <div class="mt-2">
+                            {{ form.description }}
+                        </div>
+                        {% if form.description.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.description.errors|first }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Active toggle -->
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" name="is_active" id="id_is_active"
+                            {% if form.is_active.value %}checked{% endif %}
+                            class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                        <label for="id_is_active" class="text-sm font-medium text-gray-900">Active (visible to buyers)</label>
+                    </div>
                 </div>
 
-                <!-- Images -->
+                <!-- ── Section: Images ── -->
                 <div>
-                    <label for="id_images" class="block text-sm font-medium leading-6 text-gray-900">Product Images</label>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">Product Images</h2>
+
+                    {% if mode == 'edit' and product.images.exists %}
+                        <div class="mb-3 flex flex-wrap gap-2">
+                            {% for img in product.images.all %}
+                                <img src="{{ img.image.url }}" alt="{{ product.name }}" class="h-16 w-16 object-cover rounded-md ring-1 ring-gray-200">
+                            {% endfor %}
+                        </div>
+                        <p class="text-xs text-gray-500 mb-2">Existing images shown above. Upload below to add more.</p>
+                    {% endif %}
                     <div class="mt-2">
                         {{ form.images }}
                     </div>
@@ -80,25 +141,106 @@
                     {% endif %}
                 </div>
 
-                <!-- Description -->
-                <div>
-                    <label for="id_description" class="block text-sm font-medium leading-6 text-gray-900">Description</label>
-                    <div class="mt-2">
-                        {{ form.description }}
+                <!-- ── Section: Variants ── -->
+                <div x-data="variantManager()">
+                    <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold text-gray-900">Colors & Stock</h2>
+                        <button type="button" @click="addVariant()"
+                            class="text-sm font-semibold text-indigo-600 hover:text-indigo-500 transition">
+                            + Add Color
+                        </button>
                     </div>
-                    {% if form.description.errors %}
-                        <p class="mt-2 text-sm text-red-600">{{ form.description.errors|first }}</p>
+                    <p class="text-xs text-gray-500 mb-4">Add the colors available for this product and their stock quantities. <strong class="text-indigo-600">The first color maps to the first image, the second to the second image, and so on.</strong></p>
+
+                    <!-- Existing variants (edit mode) -->
+                    {% if mode == 'edit' and product.variants.exists %}
+                        <div class="mb-4">
+                            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Existing Variants</p>
+                            {% for variant in product.variants.all %}
+                                <div class="variant-row grid grid-cols-2 gap-3 mb-3 p-3 bg-gray-50 rounded-lg ring-1 ring-gray-200">
+                                    <input type="hidden" name="variant-{{ forloop.counter0 }}-sku" value="{{ variant.sku }}">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-500 mb-1">Color</label>
+                                        <input type="text" name="variant-{{ forloop.counter0 }}-color" value="{{ variant.color }}"
+                                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-3"
+                                            placeholder="e.g., Midnight Blue">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-500 mb-1">Stock</label>
+                                        <input type="number" name="variant-{{ forloop.counter0 }}-stock" value="{{ variant.stock }}" min="0"
+                                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-3">
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
                     {% endif %}
+
+                    <!-- Dynamic new variant rows -->
+                    <template x-for="(variant, idx) in variants" :key="idx">
+                        <div class="variant-row grid grid-cols-2 gap-3 mb-3 p-3 bg-indigo-50/50 rounded-lg ring-1 ring-indigo-200">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Color *</label>
+                                <input type="text" :name="'variant-' + getIndex(idx) + '-color'" required
+                                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-3"
+                                    placeholder="e.g., Midnight Blue">
+                            </div>
+                            <div class="relative">
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Stock *</label>
+                                <input type="number" :name="'variant-' + getIndex(idx) + '-stock'" min="0" value="0" required
+                                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-3">
+                                <button type="button" @click="removeVariant(idx)"
+                                    class="absolute -top-1 -right-1 bg-red-100 text-red-600 rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-200 transition"
+                                    title="Remove color">&times;</button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Empty state hint -->
+                    <div x-show="variants.length === 0 && !hasExisting" class="text-center py-6 text-gray-400 text-sm">
+                        No colors added yet. Click <strong>+ Add Color</strong> above to add stock.
+                    </div>
                 </div>
+
             </div>
 
-            <div class="mt-8 flex items-center justify-end gap-x-6 border-t border-gray-900/10 pt-8">
-                <a href="{% url 'profile' %}" class="text-sm font-semibold leading-6 text-gray-900">Cancel</a>
-                <button type="submit" class="rounded-md bg-indigo-600 px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition">
-                    Publish Product
-                </button>
+            <!-- ── Actions ── -->
+            <div class="mt-8 flex items-center justify-between border-t border-gray-900/10 pt-8">
+                <div>
+                    {% if mode == 'edit' %}
+                        <a href="{% url 'products:product_delete' product.slug %}" class="text-sm font-semibold leading-6 text-red-600 hover:text-red-500" onclick="return confirm('Are you sure you want to delete this product? This action cannot be undone.');">Delete Product</a>
+                    {% endif %}
+                </div>
+                <div class="flex items-center gap-x-6">
+                    <a href="{% url 'products:my_shop' %}" class="text-sm font-semibold leading-6 text-gray-900">Cancel</a>
+                    <button type="submit" class="rounded-md bg-indigo-600 px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition">
+                        {% if mode == 'edit' %}Save Changes{% else %}Publish Product{% endif %}
+                    </button>
+                </div>
             </div>
         </form>
     </div>
 </div>
+
+<script>
+function variantManager() {
+    return {
+        variants: {% if mode == 'add' %}[{}]{% else %}[]{% endif %},
+        existingCount: {% if mode == 'edit' and product.variants.exists %}{{ product.variants.count }}{% else %}0{% endif %},
+        hasExisting: {% if mode == 'edit' and product.variants.exists %}true{% else %}false{% endif %},
+
+        getIndex(idx) {
+            // Offset new variant indices past existing ones
+            return this.existingCount + idx;
+        },
+
+        addVariant() {
+            this.variants.push({});
+        },
+
+        removeVariant(idx) {
+            this.variants.splice(idx, 1);
+        }
+    }
+}
+</script>
 {% endblock %}

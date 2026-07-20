@@ -7,11 +7,11 @@
     <meta name="description" content="EvoCart — Shop Smart. Trust Evo. Find the best products at great prices.">
     <title>{% block title %}EvoCart — Shop Smart. Trust Evo.{% endblock %}</title>
 
-    <!-- EvoCart Design System -->
-    <link rel="stylesheet" href="{% static 'css/base.css' %}">
-
     <!-- Tailwind CDN (utility layer only — override with base.css classes) -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- EvoCart Design System (loaded after Tailwind to override resets) -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}?v=4">
 
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
@@ -42,7 +42,7 @@
                 <li><a href="{% url 'products:home' %}">Shop</a></li>
                 {% if user.is_authenticated %}
                     {% if user.profile.role == 'S' %}
-                        <li><a href="{% url 'products:product_add' %}">Add Product</a></li>
+                        <li><a href="{% url 'products:my_shop' %}">{% if user.profile.shop_name %}{{ user.profile.shop_name }}{% else %}My Shop{% endif %}</a></li>
                     {% endif %}
                     <li><a href="{% url 'profile' %}">Account</a></li>
                 {% else %}

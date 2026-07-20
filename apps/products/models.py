@@ -49,9 +49,18 @@ class Product(TimeStampField):
     description = models.TextField(blank=True)
 
     price = models.DecimalField(
-        max_digits=7,
+        max_digits=12,
         decimal_places=2,
         validators=[MinValueValidator(0)],
+    )
+
+    old_price = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0)],
+        help_text="Original price before discount (optional). Must be greater than current price.",
     )
 
     category = models.ForeignKey(
@@ -79,6 +88,23 @@ class Product(TimeStampField):
 
     def get_absolute_url(self):
         return reverse("products:product_detail", kwargs={"slug": self.slug})
+
+    @property
+    def is_on_sale(self):
+        return bool(self.old_price and self.old_price > self.price)
+
+    @property
+    def discount_percent(self):
+        if self.is_on_sale:
+            discount = ((self.old_price - self.price) / self.old_price) * 100
+            return int(round(discount))
+        return 0
+
+    @property
+    def discount_amount(self):
+        if self.is_on_sale:
+            return self.old_price - self.price
+        return 0
 
     @property
     def total_stock(self):
@@ -120,7 +146,7 @@ class ProductVariant(TimeStampField):
     color = models.CharField(max_length=30, blank=True)
 
     price_override = models.DecimalField(
-        max_digits=7,
+        max_digits=12,
         decimal_places=2,
         null=True,
         blank=True,

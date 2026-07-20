@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if user.profile.shop_name %}{{ user.profile.shop_name }}{% else %}My Shop{% endif %} — EvoCart{% endblock %}
+
+{% block content %}
+<div class="my-shop-page">
+
+    <!-- Header -->
+    <div class="shop-header">
+        <div class="shop-header__left">
+            <h1 class="shop-title">{% if user.profile.shop_name %}{{ user.profile.shop_name }}{% else %}My Shop{% endif %}</h1>
+            <span class="shop-badge">{{ product_count }} product{{ product_count|pluralize }}</span>
+        </div>
+        <a href="{% url 'products:product_add' %}" class="btn-add-product">
+            + Add New Product
+        </a>
+    </div>
+
+    <!-- Product Grid -->
+    {% if products %}
+        <div class="shop-grid">
+            {% for product in products %}
+            <div class="shop-card">
+                <!-- Image -->
+                <div class="shop-card__image">
+                    {% with product.images.first as img %}
+                        {% if img %}
+                            <img src="{{ img.image.url }}" alt="{{ product.name }}">
+                        {% else %}
+                            <div class="shop-card__no-image">No Image</div>
+                        {% endif %}
+                    {% endwith %}
+
+                    <!-- Status badge -->
+                    {% if product.is_active %}
+                        <span class="shop-card__status shop-card__status--active">Active</span>
+                    {% else %}
+                        <span class="shop-card__status shop-card__status--inactive">Inactive</span>
+                    {% endif %}
+                </div>
+
+                <!-- Info -->
+                <div class="shop-card__body">
+                    <p class="shop-card__category">{{ product.category }}</p>
+                    <h2 class="shop-card__name">{{ product.name }}</h2>
+                    {% if product.brand %}
+                        <p class="shop-card__brand">{{ product.brand }}</p>
+                    {% endif %}
+                    <div class="shop-card__price-row">
+                        <span class="shop-card__price">Rs {{ product.price }}</span>
+                        {% if product.is_on_sale %}
+                            <span class="shop-card__old-price">Rs {{ product.old_price }}</span>
+                            <span class="shop-card__discount">-{{ product.discount_percent }}%</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="shop-card__actions">
+                    <a href="{% url 'products:product_edit' product.slug %}" class="btn-edit">
+                        Edit
+                    </a>
+                    <a href="{% url 'products:product_detail' product.slug %}" class="btn-view">
+                        View
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Empty state -->
+        <div class="shop-empty">
+            <div class="shop-empty__icon">🛍️</div>
+            <h2 class="shop-empty__title">No products yet</h2>
+            <p class="shop-empty__text">Start listing your products and reach thousands of buyers.</p>
+            <a href="{% url 'products:product_add' %}" class="btn-add-product">
+                + Add Your First Product
+            </a>
+        </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

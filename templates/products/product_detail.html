@@ -1,53 +1,195 @@
 {% extends "base.html" %}
 {% block title %}{{ product.name }} — EvoCart{% endblock %}
 {% block content %}
-<div class="grid md:grid-cols-2 gap-8">
-    <div>
-        {% with product.images.first as primary_image %}
-            {% if primary_image %}
-                <img src="{{ primary_image.image.url }}" alt="{{ primary_image.alt_text }}" class="rounded-lg w-full">
-            {% else %}
-                <div class="bg-gray-100 rounded-lg aspect-square flex items-center justify-center text-gray-400">
-                    No image
-                </div>
-            {% endif %}
-        {% endwith %}
-    </div>
-    <div>
-        <h1 class="text-2xl font-bold">{{ product.name }}</h1>
-        <p class="text-gray-500">
-            {{ product.category }} · {{ product.brand }}
-            {% if product.seller %}
-                · Seller: {{ product.seller.email }}
-            {% endif %}
-        </p>
-        <p class="text-2xl text-indigo-600 font-bold mt-4">Rs {{ product.price }}</p>
-        <p class="mt-4 text-gray-700">{{ product.description }}</p>
+<script>
+    function pdpData() {
+        return {
+            activeImageIdx: 0,
+            selectedColorIdx: 0,
+            variants: [
+                {% for variant in product.variants.all %}
+                {
+                    id: {{ variant.id }},
+                    color: "{{ variant.color|escapejs }}",
+                    stock: {{ variant.stock }},
+                    url: "{% url 'cart:cart_add' variant.id %}"
+                }{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            get currentStock() {
+                if (this.variants.length === 0) return 0;
+                return this.variants[this.selectedColorIdx].stock;
+            },
+            selectColor(idx, maxImages) {
+                this.selectedColorIdx = idx;
+                // Map color index to image index, bounded by total images
+                this.activeImageIdx = Math.min(idx, maxImages - 1);
+            }
+        }
+    }
+</script>
 
-        {% if product.variants.all %}
-            <div class="mt-6">
-                <p class="font-semibold mb-2">Options</p>
-                <div class="flex gap-2 flex-wrap">
-                    {% for variant in product.variants.all %}
-                        <span class="border rounded px-3 py-1 text-sm">
-                            {{ variant.size }} / {{ variant.color }} — Rs {{ variant.price }}
-                        </span>
-                    {% endfor %}
-                </div>
+<div class="pdp" x-data="pdpData()">
+
+    <!-- ── LEFT: Image Gallery ────────────────────────── -->
+    <div class="pdp__gallery">
+        <!-- Main image -->
+        <div class="pdp__main-image">
+            {% for img in product.images.all %}
+                <img
+                    src="{{ img.image.url }}"
+                    alt="{{ img.alt_text|default:product.name }}"
+                    class="pdp__hero"
+                    x-show="activeImageIdx === {{ forloop.counter0 }}"
+                    x-transition:enter="pdp-fade-enter"
+                    x-transition:enter-start="pdp-fade-enter-start"
+                    x-transition:enter-end="pdp-fade-enter-end"
+                >
+            {% empty %}
+                <div class="pdp__no-image">No image available</div>
+            {% endfor %}
+        </div>
+
+        <!-- Thumbnail strip -->
+        {% if product.images.count > 1 %}
+        <div class="pdp__thumbs">
+            {% for img in product.images.all %}
+                <button
+                    class="pdp__thumb"
+                    :class="{ 'pdp__thumb--active': activeImageIdx === {{ forloop.counter0 }} }"
+                    @click="activeImageIdx = {{ forloop.counter0 }}"
+                    aria-label="View image {{ forloop.counter }}"
+                >
+                    <img src="{{ img.image.url }}" alt="{{ img.alt_text|default:product.name }}">
+                </button>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ── RIGHT: Product Info ────────────────────────── -->
+    <div class="pdp__info">
+
+        <!-- Breadcrumb -->
+        <nav class="pdp__breadcrumb" aria-label="Breadcrumb">
+            <a href="{% url 'products:home' %}">Shop</a>
+            <span class="pdp__breadcrumb-sep">›</span>
+            <a href="{{ product.category.get_absolute_url }}">{{ product.category }}</a>
+            <span class="pdp__breadcrumb-sep">›</span>
+            <span>{{ product.name }}</span>
+        </nav>
+
+        <!-- Title -->
+        <h1 class="pdp__title">{{ product.name }}</h1>
+
+        <!-- Meta line -->
+        <div class="pdp__meta">
+            {% if product.brand %}
+                <span class="pdp__meta-tag">{{ product.brand }}</span>
+            {% endif %}
+            <span class="pdp__meta-tag">{{ product.category }}</span>
+        </div>
+
+        <!-- Price -->
+        <div class="pdp__price-block">
+            <div class="pdp__price-row">
+                <span class="pdp__price">Rs {{ product.price }}</span>
+                {% if product.is_on_sale %}
+                    <span class="pdp__old-price">Rs {{ product.old_price }}</span>
+                {% endif %}
             </div>
+            <div class="pdp__price-badges">
+                {% if product.is_on_sale %}
+                    <span class="pdp__discount-badge">{{ product.discount_percent }}% OFF</span>
+                    <span class="pdp__save-amount">You save Rs {{ product.discount_amount }}</span>
+                {% endif %}
+                <template x-if="variants.length > 0">
+                    <span class="pdp__stock" :class="currentStock > 0 ? 'pdp__stock--in' : 'pdp__stock--out'" x-text="currentStock > 0 ? '✓ In Stock (' + currentStock + ' left)' : '✕ Out of Stock'"></span>
+                </template>
+                <template x-if="variants.length === 0">
+                    {% if product.in_stock %}
+                        <span class="pdp__stock pdp__stock--in">✓ In Stock</span>
+                    {% else %}
+                        <span class="pdp__stock pdp__stock--out">✕ Out of Stock</span>
+                    {% endif %}
+                </template>
+            </div>
+        </div>
+
+        <!-- Divider -->
+        <hr class="pdp__divider">
+
+        <!-- Description -->
+        {% if product.description %}
+        <div class="pdp__section">
+            <h2 class="pdp__section-title">Description</h2>
+            <p class="pdp__description">{{ product.description|linebreaksbr }}</p>
+        </div>
         {% endif %}
 
-        {% with product.variants.first as default_variant %}
-{% if default_variant %}
-<form method="post" action="{% url 'cart:cart_add' default_variant.id %}" class="mt-6">
-    {% csrf_token %}
-    <input type="hidden" name="quantity" value="1">
-    <button type="submit" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold">
-        Add to Cart
-    </button>
-</form>
-{% endif %}
-{% endwith %}
+        <!-- Colors -->
+        {% if product.variants.all %}
+        <div class="pdp__section">
+            <h2 class="pdp__section-title">Color</h2>
+            <div class="pdp__colors">
+                <template x-for="(variant, index) in variants" :key="variant.id">
+                    <button 
+                        type="button"
+                        class="pdp__color-pill"
+                        :class="{ 
+                            'pdp__color-pill--active': selectedColorIdx === index,
+                            'pdp__color-pill--disabled': variant.stock === 0
+                        }"
+                        @click="selectColor(index, {{ product.images.count }})"
+                        :disabled="variant.stock === 0"
+                    >
+                        <span x-text="variant.color"></span>
+                    </button>
+                </template>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Add to Cart -->
+        <template x-if="variants.length > 0 && currentStock > 0">
+            <form method="post" :action="variants[selectedColorIdx].url" class="pdp__cart-form">
+                {% csrf_token %}
+                <div class="pdp__qty-row">
+                    <label for="qty" class="pdp__qty-label">Quantity</label>
+                    <div class="pdp__qty-control" x-data="{ qty: 1 }">
+                        <button type="button" class="pdp__qty-btn" @click="if(qty > 1) qty--" aria-label="Decrease quantity">−</button>
+                        <input type="number" name="quantity" id="qty" x-model="qty" min="1" :max="currentStock" class="pdp__qty-input" value="1">
+                        <button type="button" class="pdp__qty-btn" @click="if(qty < currentStock) qty++" aria-label="Increase quantity">+</button>
+                    </div>
+                </div>
+                <button type="submit" class="pdp__add-btn">
+                    Add to Cart
+                </button>
+            </form>
+        </template>
+        <template x-if="variants.length > 0 && currentStock === 0">
+            <div class="pdp__cart-form">
+                <button type="button" class="pdp__add-btn" disabled style="background: #e5e7eb; color: #9ca3af; cursor: not-allowed;">
+                    Out of Stock
+                </button>
+            </div>
+        </template>
+
+        <!-- Seller info -->
+        {% if product.seller %}
+        <div class="pdp__seller">
+            <p class="pdp__seller-label">Sold by</p>
+            <p class="pdp__seller-name">
+                {% if product.seller.profile.shop_name %}
+                    {{ product.seller.profile.shop_name }}
+                {% else %}
+                    {{ product.seller.email }}
+                {% endif %}
+            </p>
+        </div>
+        {% endif %}
+
     </div>
+
 </div>
-{% endblock %}s
+{% endblock %}
