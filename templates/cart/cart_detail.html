@@ -17,7 +17,7 @@
                            class="w-16 border rounded px-2 py-1">
                     <button type="submit" class="text-sm text-indigo-600">Update</button>
                 </form>
-                <p class="font-semibold">${{ item.subtotal }}</p>
+                <p class="font-semibold">Rs {{ item.subtotal }}</p>
                 <form method="post" action="{% url 'cart:cart_remove' item.variant.id %}">
                     {% csrf_token %}
                     <button type="submit" class="text-sm text-red-500">Remove</button>
@@ -27,7 +27,7 @@
     </div>
 
     <div class="mt-6 flex justify-between items-center">
-        <p class="text-xl font-bold">Total: ${{ cart.total }}</p>
+        <p class="text-xl font-bold">Total: Rs {{ cart.total }}</p>
         <a href="#" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold">
             Checkout
         </a>
