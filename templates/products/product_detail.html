@@ -65,6 +65,26 @@
             {% endfor %}
         </div>
         {% endif %}
+
+        <!-- Description (Positioned below the gallery pictures) -->
+        {% if product.description %}
+        <div class="pdp__section mt-6 pt-6 border-t border-gray-200" x-data="{ expanded: false }">
+            <h2 class="pdp__section-title">DESCRIPTION</h2>
+            {% with word_count=product.description|wordcount %}
+                {% if word_count > 50 %}
+                    <div class="pdp__description">
+                        <span x-show="!expanded">{{ product.description|truncatewords:50 }}</span>
+                        <span x-show="expanded" x-cloak>{{ product.description|linebreaksbr }}</span>
+                    </div>
+                    <button type="button" @click="expanded = !expanded" class="mt-2 text-sm font-bold text-indigo-600 hover:text-indigo-800 focus:outline-none flex items-center gap-1 cursor-pointer">
+                        <span x-text="expanded ? 'Read less ▲' : 'Read more ▼'"></span>
+                    </button>
+                {% else %}
+                    <p class="pdp__description">{{ product.description|linebreaksbr }}</p>
+                {% endif %}
+            {% endwith %}
+        </div>
+        {% endif %}
     </div>
 
     <!-- ── RIGHT: Product Info ────────────────────────── -->
@@ -118,14 +138,6 @@
 
         <!-- Divider -->
         <hr class="pdp__divider">
-
-        <!-- Description -->
-        {% if product.description %}
-        <div class="pdp__section">
-            <h2 class="pdp__section-title">Description</h2>
-            <p class="pdp__description">{{ product.description|linebreaksbr }}</p>
-        </div>
-        {% endif %}
 
         <!-- Colors -->
         {% if product.variants.all %}

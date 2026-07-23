@@ -482,11 +482,11 @@ class ProductFormTests(TestCase):
         self.assertIn("price", form.errors)
         self.assertIn("old_price", form.errors)
 
-    def test_price_equal_to_old_price_valid(self):
+    def test_price_equal_to_old_price_invalid(self):
         form = ProductForm(
             data=self._valid_data(price="100.00", old_price="100.00")
         )
-        self.assertTrue(form.is_valid(), form.errors)
+        self.assertFalse(form.is_valid())
 
     def test_price_less_than_old_price_valid(self):
         form = ProductForm(

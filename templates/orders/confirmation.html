@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Order Confirmation — EvoCart{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+
+    <!-- Success Header Card -->
+    <div class="bg-white border border-gray-200 rounded-3xl p-8 shadow-sm text-center mb-8">
+        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+            </svg>
+        </div>
+        <h1 class="text-3xl font-extrabold text-gray-900 mb-2">Thank you for your order!</h1>
+        <p class="text-gray-500 text-sm mb-6">We've received your order and are preparing it for shipment.</p>
+        
+        <div class="inline-flex items-center gap-3 bg-gray-50 border border-gray-200 px-4 py-2 rounded-xl text-xs font-mono text-gray-700">
+            <span>Order Number: <strong class="text-gray-900 font-bold">{{ order.order_number }}</strong></span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        
+        <!-- Shipping Details Card -->
+        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-3">
+            <h2 class="text-base font-bold text-gray-900 border-b pb-3 flex items-center justify-between">
+                <span>Shipping Details</span>
+                <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800">
+                    {{ order.get_status_display }}
+                </span>
+            </h2>
+            <div class="text-sm text-gray-600 space-y-1">
+                <p class="font-bold text-gray-900">{{ order.full_name }}</p>
+                <p>{{ order.street_address }}</p>
+                <p>{{ order.city }}, {{ order.state }} {{ order.postal_code }}</p>
+                <p>{{ order.country.name }}</p>
+                <p class="pt-2 text-xs text-gray-500">Email: {{ order.email }}</p>
+                {% if order.phone %}<p class="text-xs text-gray-500">Phone: {{ order.phone }}</p>{% endif %}
+            </div>
+        </div>
+
+        <!-- Payment Info Card -->
+        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-3">
+            <h2 class="text-base font-bold text-gray-900 border-b pb-3 flex items-center justify-between">
+                <span>Payment Info</span>
+                <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                    {{ order.get_payment_status_display }}
+                </span>
+            </h2>
+            <div class="text-sm text-gray-600 space-y-2">
+                <div class="flex justify-between">
+                    <span>Payment Method:</span>
+                    <span class="font-semibold text-gray-900">{{ order.get_payment_method_display }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Order Date:</span>
+                    <span class="text-gray-900">{{ order.created_at|date:"N j, Y, g:i a" }}</span>
+                </div>
+                <div class="border-t pt-2 flex justify-between font-bold text-base text-gray-900">
+                    <span>Total Amount:</span>
+                    <span class="text-indigo-600">Rs {{ order.total_amount }}</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Purchased Items Table Card -->
+    <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-8">
+        <h2 class="text-base font-bold text-gray-900 border-b pb-4 mb-4">Order Items</h2>
+        <div class="divide-y divide-gray-100">
+            {% for item in order.items.all %}
+                <div class="py-3 flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 bg-gray-50 border rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
+                            {% if item.variant.product.images.first %}
+                                <img src="{{ item.variant.product.images.first.image.url }}" alt="{{ item.product_name }}" class="w-full h-full object-cover">
+                            {% else %}
+                                <span class="text-[10px] text-gray-400">No img</span>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-900 text-sm">{{ item.product_name }}</p>
+                            {% if item.variant_info %}
+                                <p class="text-xs text-gray-500">{{ item.variant_info }}</p>
+                            {% endif %}
+                            <p class="text-xs text-gray-400">Qty: {{ item.quantity }} &bull; Unit Price: Rs {{ item.price }}</p>
+                        </div>
+                    </div>
+                    <span class="font-bold text-gray-900 text-sm">Rs {{ item.subtotal }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center">
+        <a href="{% url 'products:home' %}" class="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-3.5 rounded-xl shadow transition-colors">
+            Continue Shopping
+        </a>
+    </div>
+
+</div>
+{% endblock %}

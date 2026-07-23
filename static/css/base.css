@@ -504,6 +504,8 @@ main.site-main { flex: 1; padding-block: 2rem; }
     grid-template-columns: 1fr;
     gap: 2.5rem;
     padding: 2rem 0 4rem;
+    min-width: 0;
+    width: 100%;
 }
 @media (min-width: 768px) {
     .pdp {
@@ -515,21 +517,36 @@ main.site-main { flex: 1; padding-block: 2rem; }
 /* ── Gallery ────────────────────────────────────────────── */
 .pdp__gallery {
     position: relative;
+    min-width: 0;
+    width: 100%;
+}
+
+.pdp__info {
+    min-width: 0;
+    width: 100%;
 }
 
 .pdp__main-image {
     position: relative;
+    width: 100%;
+    max-width: 100%;
     aspect-ratio: 1 / 1;
+    max-height: 520px;
     background: var(--color-surface, #f7f8fa);
     border-radius: var(--radius-lg, 16px);
     overflow: hidden;
     border: 1px solid var(--color-border-light, #e4e7ec);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .pdp__hero {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
     display: block;
 }
 
@@ -650,6 +667,7 @@ main.site-main { flex: 1; padding-block: 2rem; }
     display: flex;
     align-items: baseline;
     gap: 0.75rem;
+    flex-wrap: wrap;
 }
 
 .pdp__price {
@@ -726,6 +744,10 @@ main.site-main { flex: 1; padding-block: 2rem; }
     font-size: 0.95rem;
     line-height: 1.7;
     color: var(--color-text-secondary, #5b6472);
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    word-wrap: break-word;
+    max-width: 100%;
 }
 
 /* ── Colors ─────────────────────────────────────────────── */

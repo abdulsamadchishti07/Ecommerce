@@ -44,21 +44,35 @@ class ProductForm(forms.ModelForm):
 
         self.fields['name'].widget.attrs.update({'class': text_classes, 'placeholder': 'e.g., Wireless Headphones'})
         self.fields['description'].widget.attrs.update({'class': text_classes, 'rows': 4, 'placeholder': 'Describe your product...'})
-        self.fields['price'].widget.attrs.update({'class': text_classes, 'placeholder': '0.00'})
-        self.fields['old_price'].widget.attrs.update({'class': text_classes, 'placeholder': '0.00 (optional)'})
+        self.fields['price'].widget.attrs.update({'class': text_classes, 'placeholder': '0.00 (optional if Original Price is set)'})
+        self.fields['old_price'].widget.attrs.update({'class': text_classes, 'placeholder': '0.00'})
         self.fields['category_name'].widget.attrs.update({'class': text_classes, 'placeholder': 'e.g., Electronics'})
         self.fields['brand_name'].widget.attrs.update({'class': text_classes, 'placeholder': 'e.g., Sony'})
         self.fields['images'].widget.attrs.update({'class': 'block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100'})
+
+        # Make sale price optional
+        self.fields['price'].required = False
+        self.fields['old_price'].required = False
 
     def clean(self):
         cleaned_data = super().clean()
         price = cleaned_data.get('price')
         old_price = cleaned_data.get('old_price')
 
-        if price is not None and old_price is not None:
-            if price > old_price:
-                self.add_error('price', "New/Sale price cannot be greater than the original (old) price.")
-                self.add_error('old_price', "Original price must be greater than or equal to the new price.")
+        if price is None and old_price is None:
+            self.add_error('price', "Please enter an Original Price or a Sale Price.")
+            self.add_error('old_price', "Please enter an Original Price or a Sale Price.")
+            return cleaned_data
+
+        # If only old_price is provided (no discount/sale price)
+        if price is None and old_price is not None:
+            cleaned_data['price'] = old_price
+            cleaned_data['old_price'] = None
+        # If both price (sale price) and old_price (original price) are provided
+        elif price is not None and old_price is not None:
+            if price >= old_price:
+                self.add_error('price', "Sale price must be smaller than the original price.")
+                self.add_error('old_price', "Original price must be greater than the sale price.")
 
         return cleaned_data
 

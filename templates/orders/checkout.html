@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Checkout — EvoCart{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    
+    <!-- Header -->
+    <div class="mb-8 border-b pb-4">
+        <nav class="text-xs text-gray-500 mb-2 flex items-center gap-2">
+            <a href="{% url 'products:home' %}" class="hover:text-indigo-600">Home</a>
+            <span>&rsaquo;</span>
+            <a href="{% url 'cart:cart_detail' %}" class="hover:text-indigo-600">Cart</a>
+            <span>&rsaquo;</span>
+            <span class="text-gray-900 font-medium">Checkout</span>
+        </nav>
+        <h1 class="text-3xl font-extrabold text-gray-900">Checkout</h1>
+    </div>
+
+    <form method="post" action="{% url 'orders:checkout' %}" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {% csrf_token %}
+
+        <!-- Left Column: Shipping & Payment Info (7 Cols) -->
+        <div class="lg:col-span-7 space-y-6">
+            
+            <!-- Contact Information Card -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <span class="w-7 h-7 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center text-sm">1</span>
+                    Contact Information
+                </h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Email Address *</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <p class="text-red-500 text-xs mt-1">{{ form.email.errors|first }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipping Address Card -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <span class="w-7 h-7 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center text-sm">2</span>
+                    Shipping Address
+                </h2>
+
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">First Name *</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                                <p class="text-red-500 text-xs mt-1">{{ form.first_name.errors|first }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Last Name *</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                                <p class="text-red-500 text-xs mt-1">{{ form.last_name.errors|first }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Phone Number</label>
+                        {{ form.phone }}
+                        {% if form.phone.errors %}
+                            <p class="text-red-500 text-xs mt-1">{{ form.phone.errors|first }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Street Address *</label>
+                        {{ form.street_address }}
+                        {% if form.street_address.errors %}
+                            <p class="text-red-500 text-xs mt-1">{{ form.street_address.errors|first }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">City *</label>
+                            {{ form.city }}
+                            {% if form.city.errors %}
+                                <p class="text-red-500 text-xs mt-1">{{ form.city.errors|first }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">State / Province</label>
+                            {{ form.state }}
+                            {% if form.state.errors %}
+                                <p class="text-red-500 text-xs mt-1">{{ form.state.errors|first }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Postal Code *</label>
+                            {{ form.postal_code }}
+                            {% if form.postal_code.errors %}
+                                <p class="text-red-500 text-xs mt-1">{{ form.postal_code.errors|first }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Country *</label>
+                        {{ form.country }}
+                        {% if form.country.errors %}
+                            <p class="text-red-500 text-xs mt-1">{{ form.country.errors|first }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Method Card -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <span class="w-7 h-7 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center text-sm">3</span>
+                    Payment Method
+                </h2>
+
+                <div class="space-y-3">
+                    {% for choice_val, choice_label in form.payment_method.field.choices %}
+                        <label class="flex items-center gap-3 p-3.5 border rounded-xl cursor-pointer hover:border-indigo-500 transition-colors">
+                            <input type="radio" name="payment_method" value="{{ choice_val }}" {% if form.payment_method.value == choice_val or forloop.first %}checked{% endif %} class="text-indigo-600 focus:ring-indigo-500">
+                            <div>
+                                <span class="font-bold text-gray-900 text-sm block">{{ choice_label }}</span>
+                                {% if choice_val == 'COD' %}
+                                    <span class="text-xs text-gray-500">Pay cash upon delivery at your doorstep</span>
+                                {% elif choice_val == 'CARD' %}
+                                    <span class="text-xs text-gray-500">Credit / Debit Card (Stripe integration ready)</span>
+                                {% elif choice_val == 'BANK' %}
+                                    <span class="text-xs text-gray-500">Direct transfer to EvoCart business account</span>
+                                {% endif %}
+                            </div>
+                        </label>
+                    {% endfor %}
+                    {% if form.payment_method.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.payment_method.errors|first }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Order Summary Sidebar (5 Cols) -->
+        <div class="lg:col-span-5 bg-gray-50 border border-gray-200 rounded-2xl p-6 shadow-sm sticky top-6">
+            <h2 class="text-lg font-bold text-gray-900 border-b pb-4 mb-4">
+                Order Summary ({{ cart|length }} item{% if cart|length > 1 %}s{% endif %})
+            </h2>
+
+            <!-- Items list in summary -->
+            <div class="space-y-3 max-h-64 overflow-y-auto pr-1 mb-4 border-b pb-4">
+                {% for item in cart %}
+                    <div class="flex items-center justify-between gap-3 text-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-white border rounded overflow-hidden flex-shrink-0 flex items-center justify-center">
+                                {% if item.variant.product.images.first %}
+                                    <img src="{{ item.variant.product.images.first.image.url }}" alt="{{ item.variant.product.name }}" class="w-full h-full object-cover">
+                                {% else %}
+                                    <span class="text-[10px] text-gray-400">No img</span>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900 text-xs leading-tight line-clamp-1">{{ item.variant.product.name }}</p>
+                                <p class="text-[11px] text-gray-500">Qty: {{ item.quantity }} &bull; {{ item.variant.color|default:'' }} {{ item.variant.size|default:'' }}</p>
+                            </div>
+                        </div>
+                        <span class="font-semibold text-gray-900 text-xs flex-shrink-0">Rs {{ item.subtotal }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Price Calculations -->
+            <div class="space-y-2.5 text-sm text-gray-600">
+                <div class="flex justify-between">
+                    <span>Subtotal</span>
+                    <span class="font-medium text-gray-900">Rs {{ cart.total }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Shipping</span>
+                    <span class="text-emerald-600 font-semibold">FREE</span>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-200 mt-4 pt-4 flex justify-between items-center">
+                <span class="text-base font-bold text-gray-900">Total Payable</span>
+                <span class="text-2xl font-black text-indigo-600">Rs {{ cart.total }}</span>
+            </div>
+
+            <button type="submit" class="w-full mt-6 bg-[#FF6A3D] hover:bg-[#E5572C] text-white font-bold py-3.5 px-6 rounded-xl shadow transition-colors flex items-center justify-center gap-2">
+                <span>Place Order</span>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+            </button>
+        </div>
+
+    </form>
+</div>
+
+<style>
+    .form-input {
+        width: 100%;
+        border-radius: 0.5rem;
+        border: 1px solid #cbd5e1;
+        padding: 0.625rem 0.75rem;
+        font-size: 0.875rem;
+        color: #0f172a;
+        transition: border-color 0.15s ease-in-out;
+    }
+    .form-input:focus {
+        outline: none;
+        border-color: #2454e0;
+        box-shadow: 0 0 0 2px rgba(36, 84, 224, 0.15);
+    }
+</style>
+{% endblock %}

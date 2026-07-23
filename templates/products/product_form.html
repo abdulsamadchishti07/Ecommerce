@@ -42,34 +42,34 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <!-- New / Sale Price -->
+                        <!-- Sale / Discount Price -->
                         <div>
-                            <label for="id_price" class="block text-sm font-medium leading-6 text-gray-900">Sale / New Price (PKR) *</label>
+                            <label for="id_price" class="block text-sm font-medium leading-6 text-gray-900">Sale / Discount Price (PKR) <span class="text-xs text-gray-500 font-normal">(Optional)</span></label>
                             <div class="mt-2 relative rounded-md shadow-sm">
                                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                     <span class="text-gray-500 sm:text-sm">Rs</span>
                                 </div>
-                                <input type="number" name="price" id="id_price" step="0.01" min="0" required
+                                <input type="number" name="price" id="id_price" step="0.01" min="0"
                                     class="block w-full rounded-md border-0 py-1.5 pl-8 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                     placeholder="0.00" value="{{ form.price.value|default:'' }}">
                             </div>
+                            <p class="mt-1 text-xs text-gray-500">Must be smaller than the Original Price.</p>
                             {% if form.price.errors %}
                                 <p class="mt-2 text-sm text-red-600">{{ form.price.errors|first }}</p>
                             {% endif %}
                         </div>
 
-                        <!-- Original / Old Price -->
+                        <!-- Original / Regular Price -->
                         <div>
-                            <label for="id_old_price" class="block text-sm font-medium leading-6 text-gray-900">Original / Old Price (PKR) <span class="text-xs text-gray-500 font-normal">(Optional for discount)</span></label>
+                            <label for="id_old_price" class="block text-sm font-medium leading-6 text-gray-900">Original / Regular Price (PKR)</label>
                             <div class="mt-2 relative rounded-md shadow-sm">
                                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                     <span class="text-gray-500 sm:text-sm">Rs</span>
                                 </div>
                                 <input type="number" name="old_price" id="id_old_price" step="0.01" min="0"
                                     class="block w-full rounded-md border-0 py-1.5 pl-8 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                    placeholder="e.g. 25000.00" value="{{ form.old_price.value|default:'' }}">
+                                    placeholder="e.g. 550000.00" value="{{ form.old_price.value|default:'' }}">
                             </div>
-                            <p class="mt-1 text-xs text-gray-500">Must be higher than the Sale Price to show a discount strike-through.</p>
                             {% if form.old_price.errors %}
                                 <p class="mt-2 text-sm text-red-600">{{ form.old_price.errors|first }}</p>
                             {% endif %}
