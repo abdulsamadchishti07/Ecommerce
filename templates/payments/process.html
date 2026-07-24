@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Payment Gateway — Order #{{ order.order_number }} — EvoCart{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    
+    <!-- Page Header & Breadcrumb -->
+    <div class="mb-8 border-b border-gray-200 pb-4">
+        <nav class="text-xs text-gray-500 mb-2 flex items-center gap-2">
+            <a href="{% url 'products:home' %}" class="hover:text-indigo-600 transition-colors">Home</a>
+            <span>&rsaquo;</span>
+            <a href="{% url 'cart:cart_detail' %}" class="hover:text-indigo-600 transition-colors">Cart</a>
+            <span>&rsaquo;</span>
+            <a href="{% url 'orders:checkout' %}" class="hover:text-indigo-600 transition-colors">Checkout</a>
+            <span>&rsaquo;</span>
+            <span class="text-gray-900 font-medium">Payment Gateway</span>
+        </nav>
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Complete Your Payment</h1>
+                <p class="text-xs text-gray-500 mt-1">Secure payment processing for Order <strong class="text-gray-900 font-mono">#{{ order.order_number }}</strong></p>
+            </div>
+            <div class="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-100 px-3.5 py-1.5 rounded-full text-xs font-semibold text-indigo-700">
+                <span class="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></span>
+                <span>Payment Pending</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left Column: Card Input & Visual (7 Cols) -->
+        <div class="lg:col-span-7 space-y-6">
+
+            <!-- Interactive Virtual Credit Card Visual -->
+            <div class="relative w-full h-52 bg-gradient-to-tr from-slate-950 via-indigo-950 to-slate-900 text-white rounded-2xl p-6 shadow-xl overflow-hidden flex flex-col justify-between transform transition-all duration-300 hover:scale-[1.01] hover:shadow-2xl border border-slate-800">
+                <!-- Ambient Background Effects -->
+                <div class="absolute -right-12 -bottom-12 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -left-12 -top-12 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <!-- Card Header: Brand & Contactless Icon -->
+                <div class="flex justify-between items-center relative z-10">
+                    <div>
+                        <span class="text-[11px] font-black uppercase tracking-widest text-indigo-300">EvoPay Premium</span>
+                        <p class="text-[10px] text-slate-400 font-medium">Debit / Credit Card</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <!-- Wireless Signal Icon -->
+                        <svg class="w-6 h-6 text-slate-400 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.071-7.071a10 10 0 0114.142 0M2.05 8.05a15 15 0 0120.9 0"/>
+                        </svg>
+                        <!-- EMV Metallic Chip -->
+                        <div class="w-10 h-7 bg-gradient-to-br from-amber-200 via-amber-400 to-amber-500 rounded-md border border-amber-300/60 shadow-inner flex items-center justify-center p-1">
+                            <div class="w-full h-full border border-amber-800/40 rounded flex flex-col justify-between py-0.5">
+                                <div class="w-full h-[1px] bg-amber-800/30"></div>
+                                <div class="w-full h-[1px] bg-amber-800/30"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Number Display -->
+                <div class="relative z-10 py-2">
+                    <p class="text-[9px] uppercase tracking-wider text-slate-400 mb-1">Card Number</p>
+                    <div class="font-mono text-xl sm:text-2xl tracking-widest text-white font-semibold drop-shadow" id="card-display-number">
+                        •••• •••• •••• ••••
+                    </div>
+                </div>
+
+                <!-- Card Footer: Name & Expiry -->
+                <div class="flex justify-between items-end relative z-10 text-xs font-mono">
+                    <div>
+                        <p class="text-[9px] uppercase tracking-wider text-slate-400">Card Holder</p>
+                        <p class="font-semibold tracking-wider text-slate-100 uppercase truncate max-w-[220px]" id="card-display-name">
+                            {{ order.full_name|default:"CARDHOLDER NAME" }}
+                        </p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[9px] uppercase tracking-wider text-slate-400">Expires</p>
+                        <p class="font-semibold text-slate-100" id="card-display-expiry">MM/YY</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Payment Input Card -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-4 mb-5">
+                    <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        <span>Card Details</span>
+                    </h2>
+                    
+                    <!-- Accepted Card Logos -->
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-[10px] font-semibold text-gray-400 uppercase mr-1">Accepted:</span>
+                        <span class="px-2 py-0.5 border text-[10px] font-bold rounded bg-slate-50 text-slate-700">VISA</span>
+                        <span class="px-2 py-0.5 border text-[10px] font-bold rounded bg-slate-50 text-slate-700">MC</span>
+                        <span class="px-2 py-0.5 border text-[10px] font-bold rounded bg-slate-50 text-slate-700">AMEX</span>
+                    </div>
+                </div>
+
+                <!-- HTTP Dev Notice Banner -->
+                <div class="p-3.5 bg-amber-50/80 border border-amber-200 text-amber-900 text-xs rounded-xl flex items-start gap-3 mb-5">
+                    <svg class="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div>
+                        <strong class="font-bold">Local Development Mode (HTTP):</strong>
+                        <span class="text-amber-800">Browser autofill popup is suppressed over non-HTTPS connections. You can type any test card info below and click <strong>Pay Now</strong>!</span>
+                    </div>
+                </div>
+
+                <form method="post" action="{% url 'payments:process' order.order_number %}" id="payment-form" class="space-y-4" autocomplete="off">
+                    {% csrf_token %}
+
+                    {% if stripe_enabled %}
+                        <!-- Stripe Elements Container -->
+                        <div id="stripe-card-element" class="p-4 border border-gray-300 rounded-xl bg-gray-50 focus-within:border-indigo-600 transition-colors"></div>
+                        <div id="card-errors" class="text-red-500 text-xs mt-1"></div>
+                        <input type="hidden" name="stripe_payment_id" id="stripe_payment_id">
+                    {% else %}
+                        <!-- Standard / Card Input Form -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Cardholder Name *</label>
+                            <input type="text" id="card_name" name="card_name" value="{{ order.full_name }}" required
+                                   class="form-input" placeholder="Name as printed on card" autocomplete="off" data-1p-ignore="true" data-lpignore="true"
+                                   oninput="document.getElementById('card-display-name').innerText = this.value.toUpperCase() || 'CARDHOLDER NAME'">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Card Number *</label>
+                            <div class="relative">
+                                <input type="text" id="card_number" name="card_number" maxlength="19" required
+                                       class="form-input form-input-has-icon font-mono !pl-11" placeholder="4532 •••• •••• ••••" autocomplete="off" data-1p-ignore="true" data-lpignore="true"
+                                       oninput="formatCardNumber(this)">
+                                <div class="absolute left-3.5 top-3.5 text-gray-400 pointer-events-none flex items-center">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Expiration Date *</label>
+                                <input type="text" id="card_expiry" name="card_expiry" placeholder="MM/YY" maxlength="5" required
+                                       class="form-input font-mono text-center" autocomplete="off" data-1p-ignore="true" data-lpignore="true"
+                                       oninput="formatExpiry(this)">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">CVC / CVV *</label>
+                                <input type="password" id="card_cvc" name="card_cvc" maxlength="4" placeholder="•••" required
+                                       class="form-input font-mono text-center" autocomplete="off" data-1p-ignore="true" data-lpignore="true">
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="simulate_success" value="1">
+                    {% endif %}
+
+                    <!-- Submit Button -->
+                    <button type="submit" id="submit-pay-btn" class="w-full mt-6 bg-[#FF6A3D] hover:bg-[#E5572C] text-white font-bold py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 text-base">
+                        <span id="btn-text">Pay Rs {{ order.total_amount }} Now</span>
+                        <svg id="btn-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        <svg id="btn-spinner" class="hidden animate-spin w-5 h-5 text-white" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </button>
+                </form>
+
+                <!-- Security Trust Footer -->
+                <div class="mt-5 pt-4 border-t border-gray-100 flex items-center justify-center gap-2 text-xs text-gray-400">
+                    <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                    <span>256-Bit End-to-End SSL Encrypted Transaction</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Order Summary Sidebar (5 Cols) -->
+        <div class="lg:col-span-5 bg-gray-50 border border-gray-200 rounded-2xl p-6 shadow-sm sticky top-6 space-y-5">
+            <div>
+                <h2 class="text-lg font-bold text-gray-900 border-b pb-4 mb-4">
+                    Order Summary ({{ order.items.count }} item{% if order.items.count > 1 %}s{% endif %})
+                </h2>
+
+                <!-- Items list in summary -->
+                <div class="space-y-3 max-h-60 overflow-y-auto pr-1 mb-4 border-b pb-4">
+                    {% for item in order.items.all %}
+                        <div class="flex items-center justify-between gap-3 text-sm">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 bg-white border border-gray-200 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
+                                    {% if item.variant.product.images.first %}
+                                        <img src="{{ item.variant.product.images.first.image.url }}" alt="{{ item.product_name }}" class="w-full h-full object-cover">
+                                    {% else %}
+                                        <span class="text-[10px] text-gray-400">No img</span>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-900 text-xs leading-tight line-clamp-1">{{ item.product_name }}</p>
+                                    <p class="text-[11px] text-gray-500">Qty: {{ item.quantity }} {% if item.variant_info %}&bull; {{ item.variant_info }}{% endif %}</p>
+                                </div>
+                            </div>
+                            <span class="font-semibold text-gray-900 text-xs flex-shrink-0">Rs {{ item.subtotal }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Price Calculations -->
+                <div class="space-y-2.5 text-sm text-gray-600">
+                    <div class="flex justify-between">
+                        <span>Subtotal</span>
+                        <span class="font-medium text-gray-900">Rs {{ order.total_amount }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Shipping</span>
+                        <span class="text-emerald-600 font-semibold">FREE</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Payment Method</span>
+                        <span class="font-medium text-indigo-600">Credit / Debit Card</span>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-200 mt-4 pt-4 flex justify-between items-center">
+                    <span class="text-base font-bold text-gray-900">Total Amount</span>
+                    <span class="text-2xl font-black text-indigo-600">Rs {{ order.total_amount }}</span>
+                </div>
+            </div>
+
+            <!-- Recipient & Shipping Info Box -->
+            <div class="bg-white border border-gray-200 rounded-xl p-4 text-xs text-gray-700 space-y-1.5">
+                <p class="font-bold text-gray-900 uppercase tracking-wider text-[10px]">Shipping To:</p>
+                <p class="font-semibold text-gray-900 text-sm">{{ order.full_name }}</p>
+                <p>{{ order.street_address }}, {{ order.city }}</p>
+                <p class="text-gray-500">Email: {{ order.email }}</p>
+                {% if order.phone %}<p class="text-gray-500">Phone: {{ order.phone }}</p>{% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function formatCardNumber(input) {
+        let val = input.value.replace(/\D/g, '');
+        let formatted = val.match(/.{1,4}/g)?.join(' ') || '';
+        input.value = formatted.substring(0, 19);
+        
+        let display = document.getElementById('card-display-number');
+        if (display) {
+            display.innerText = formatted.padEnd(19, '•').substring(0, 19) || '•••• •••• •••• ••••';
+        }
+    }
+
+    function formatExpiry(input) {
+        let val = input.value.replace(/\D/g, '');
+        if (val.length >= 2) {
+            input.value = val.substring(0, 2) + '/' + val.substring(2, 4);
+        } else {
+            input.value = val;
+        }
+        let display = document.getElementById('card-display-expiry');
+        if (display) {
+            display.innerText = input.value || 'MM/YY';
+        }
+    }
+
+    document.getElementById('payment-form')?.addEventListener('submit', function() {
+        document.getElementById('btn-text').innerText = 'Processing Payment...';
+        document.getElementById('btn-icon')?.classList.add('hidden');
+        document.getElementById('btn-spinner')?.classList.remove('hidden');
+        document.getElementById('submit-pay-btn').disabled = true;
+    });
+</script>
+
+<style>
+    .form-input {
+        width: 100%;
+        border-radius: 0.5rem;
+        border: 1px solid #cbd5e1;
+        padding: 0.625rem 0.75rem;
+        font-size: 0.875rem;
+        color: #0f172a;
+        background-color: #ffffff;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    .form-input:focus {
+        outline: none;
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    }
+    .form-input-has-icon {
+        padding-left: 2.75rem !important;
+    }
+</style>
+{% endblock %}

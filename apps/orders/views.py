@@ -64,11 +64,27 @@ def checkout_view(request):
                         variant.stock -= item.quantity
                         variant.save(update_fields=["stock", "updated_at"])
 
-                    # 4. Clear cart
+                    # 4. Create Payment record & route to payment flow
+                    from apps.payments.models import Payment
+                    payment = Payment.objects.create(
+                        order=order,
+                        payment_method=order.payment_method,
+                        amount=order.total_amount,
+                        status="PENDING",
+                    )
+
+                    # 5. Clear cart
                     cart.clear()
 
-                    messages.success(request, f"Order #{order.order_number} placed successfully!")
-                    return redirect("orders:order_confirmation", order_number=order.order_number)
+                    if order.payment_method == "CARD":
+                        messages.info(request, "Please enter your card details to complete your payment.")
+                        return redirect("payments:process", order_number=order.order_number)
+                    elif order.payment_method == "BANK":
+                        messages.info(request, "Please complete your bank transfer using the details below.")
+                        return redirect("payments:bank_transfer", order_number=order.order_number)
+                    else:
+                        messages.success(request, f"Order #{order.order_number} placed successfully!")
+                        return redirect("orders:order_confirmation", order_number=order.order_number)
 
             except Exception as e:
                 messages.error(request, f"An unexpected error occurred while placing your order: {str(e)}")

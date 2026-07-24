@@ -557,7 +557,7 @@ class ProfileUpdateTests(TestCase):
             "city": "San Francisco",
             "state": "CA",
             "postal_code": "94103",
-            "country": "USA"
+            "country": "US"
         })
         self.assertRedirects(response, reverse("profile"))
         
